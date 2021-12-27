@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-const Restaurants = require("../model/restaurant.model");
+const Restaurant = require("../model/restaurant.model");
 
 module.exports.createNewRestaurant = async ({
   business_name,
@@ -10,37 +10,38 @@ module.exports.createNewRestaurant = async ({
 }) => {
   await bcrypt.genSalt(10, async (err, salt) => {
     await bcrypt.hash(password, salt).then((hashedPassword) => {
-      const restaurant = new Restaurants({
-        business_name: business_name,
-        email: email,
-        username: username,
-        Password: hashedPassword,
-        location: location,
+      const restaurant = new Restaurant();
+      return new Promise((resolve, _) => {
+        restaurant.business_name = business_name;
+        restaurant.username = username;
+        restaurant.email = email;
+        restaurant.location = location;
+        restaurant.password = hashedPassword;
+        restaurant.save();
+        resolve(restaurant);
       });
-      restaurant.save();
-      return restaurant;
     });
   });
 };
 
 module.exports.getAllRestaurants = async () => {
-  const restaurants = await Restaurants.find({});
+  const restaurants = await Restaurant.find({});
   return restaurants;
 };
 
 module.exports.getRestrauntById = async ({ id }) => {
-  const restraunt = await Restaurants.findOne({ _id: id });
+  const restraunt = await Restaurant.findOne({ _id: id });
   return restraunt;
 };
 
 module.exports.deleteRestaurant = async ({ id }) => {
-  await Restaurants.findOneAndRemove({ _id: id }, () => {
+  await Restaurant.findOneAndRemove({ _id: id }, () => {
     return true;
   });
 };
 
 module.exports.updateRestaurant = async (restraunt_id, newRestraunt) => {
-  await Restaurants.findOneAndUpdate(
+  await Restaurant.findOneAndUpdate(
     { _id: restraunt_id },
     newRestraunt,
     {
