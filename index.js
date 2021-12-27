@@ -74,16 +74,15 @@ app.get("/pay", (req, res) => {
 });
 
 //base endpoints
-app.use("/user", usersRoutes);
+app.use("/diner", usersRoutes);
+app.use("/restaurant", restaurantsRoutes);
 app.use("/dish", dishesRoutes);
-app.use("/dish/category", dishCategoriesRoutes);
-app.use("/dish/origin", dishOriginRoutes);
+app.use("/search", dishSearchRoute);
+app.use("/cart", cartRoutes);
 app.use("/password-reset", resetPasswordRoute);
 app.use("/payment", paymentRoutes);
-app.use("/search", dishSearchRoute);
-app.use("/restaurant", restaurantsRoutes);
-app.use("/cart", cartRoutes);
-app.use("/checkout", checkoutRoutes);
+
+//swagger api endpoint
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 
 //starting the server
