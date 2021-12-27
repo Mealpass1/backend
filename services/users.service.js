@@ -28,11 +28,9 @@ module.exports.UserLogin = async (req) => {
 
 module.exports.deleteUser = async (req) => {
   const { id } = req;
-  const user = await User.deleteOne({ _id: id });
-  if (!user) {
-    return false;
-  }
-  return user;
+  await User.findOneAndRemove({ _id: id }, () => {
+    return true;
+  });
 };
 
 module.exports.getAllUsers = () => {
