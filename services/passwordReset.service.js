@@ -1,10 +1,8 @@
-const JWT = require("jsonwebtoken");
-const Users = require("../model/users.model");
+const Users = require("../model/user.model");
 const Token = require("../model/token.model");
 const { sendEmail } = require("../utils/sendEmail");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
-const { hashFunction } = require("../utils/hashFunction");
 
 module.exports.requestPasswordReset = async (email) => {
   const user = await Users.findOne({ email: email });
@@ -16,7 +14,8 @@ module.exports.requestPasswordReset = async (email) => {
     await token.deleteOne();
   }
   let resetToken = crypto.randomBytes(32).toString("hex");
-  const hash = hashFunction(resetToken);
+  const salt = bcrypt.genSalt(10);
+  const hash = bcrypt.hash(resetToken, salt);
   await new Token({
     userId: user._id,
     token: hash,
