@@ -1,6 +1,5 @@
 //packages
 const jwt = require("jsonwebtoken");
-var refreshToken = require("refresh-token");
 
 //services
 const {
@@ -17,7 +16,9 @@ const { checkUserExistence } = require("../helpers/user.exists");
 
 //controllers
 module.exports.UserRegistrationController = async (req, res) => {
-  if ((await checkUserExistence(req.body.email)) === true) {
+  const exists = await checkUserExistence(req.body.email);
+
+  if (exists) {
     return res.json({
       status: "error",
       message: "user exists",
@@ -40,11 +41,10 @@ module.exports.UserRegistrationController = async (req, res) => {
 };
 
 module.exports.UserLoginController = async (req, res) => {
-  const loggedInUser = await UserLogin(req.body);
+  const { _id } = await UserLogin(req.body);
 
   if (loggedInUser) {
-    const id = loggedInUser._id;
-    let payload = { id };
+    let payload = { _id };
     let accessToken = jwt.sign(payload, "swsh23hjddnns", {
       algorithm: "HS256",
       expiresIn: 86400,
@@ -79,48 +79,51 @@ module.exports.deleteUserController = async (req, res) => {
 };
 
 module.exports.getAllUsers = async (req, res) => {
-  const users = await getAllUsers();
-  if (users) {
-    return res.json({
-      status: "success",
-      message: "users",
-      data: users,
-    });
-  } else {
-    return res.json({
-      status: "error",
-      message: "server error",
-    });
-  }
+  await getAllUsers().then((users) => {
+    if (users) {
+      return res.json({
+        status: "success",
+        message: "users",
+        data: users,
+      });
+    } else {
+      return res.json({
+        status: "error",
+        message: "server error",
+      });
+    }
+  });
 };
 
 module.exports.getUserById = async (req, res) => {
-  await getUserById(req.params).then((response) => {
-    if (response) {
+  await getUserById(req.params).then((user) => {
+    if (user) {
       return res.json({
         status: "success",
         message: "user",
-        data: response,
+        data: user,
+      });
+    } else {
+      return res.json({
+        status: "error",
+        message: "user not found",
       });
     }
-    return res.json({
-      status: "error",
-      message: "user not found",
-    });
   });
 };
 
 module.exports.updateUserController = async (req, res) => {
-  await updateUser(req.params.id, req.body).then((response) => {
-    if (response) {
+  await updateUser(req.params.id, req.body).then((updatedUser) => {
+    if (updatedUser) {
       return res.json({
         status: "success",
         message: "user updated",
       });
+    } else {
+      return res.json({
+        status: "error",
+        message: "Failed to update user",
+      });
     }
-    return res.json({
-      status: "error",
-      message: "Failed to update user",
-    });
   });
 };
