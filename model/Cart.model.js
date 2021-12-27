@@ -28,7 +28,7 @@ const cartSchema = new Schema({
   },
   timeOfMeal: {
     type: String,
-    required: false,
+    required: true,
   },
   createdAt: Date,
   daysInWeek: [
@@ -43,12 +43,16 @@ const cartSchema = new Schema({
         "Saturday",
         "Sunday",
       ],
-      required: false,
+      required: true,
     },
   ],
   NumberOfRepetition: {
     type: String,
-    required: false,
+    required: true,
+  },
+  mealServing: {
+    type: Number,
+    required: true,
   },
 });
 
