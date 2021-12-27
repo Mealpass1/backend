@@ -1,20 +1,23 @@
 //packages
+const bcrypt = require("bcrypt");
+
 const User = require("../model/user.model");
-const { hashFunction } = require("../utils/hashFunction");
 const { verifyPassword } = require("../utils/verify.password");
 
 //services
 module.exports.RegisterUser = async (req) => {
   const user = new User();
   const { fullname, email, username, password } = req;
-  const hashedPassword = await hashFunction(password);
-  return new Promise((resolve, _) => {
-    user.fullname = fullname;
-    user.email = email;
-    user.username = username;
-    user.password = hashedPassword;
-    user.save();
-    resolve(user);
+  const salt = bcrypt.genSalt(10);
+  await bcrypt.hash(password, salt).then((hashedPassword) => {
+    return new Promise((resolve, _) => {
+      user.fullname = fullname;
+      user.email = email;
+      user.username = username;
+      user.password = hashedPassword;
+      user.save();
+      resolve(user);
+    });
   });
 };
 
