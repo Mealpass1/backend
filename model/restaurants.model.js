@@ -37,5 +37,17 @@ const restaurantsSchema = new Schema({
     type: String,
     required: false,
   },
+  dishCategories: {
+    type: [
+      {
+        id: {
+          type: Number,
+        },
+        name: {
+          type: String,
+        },
+      },
+    ],
+  },
 });
 module.exports = mongoose.model("Restaurant", restaurantsSchema);
