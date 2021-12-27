@@ -22,24 +22,19 @@ dotenv.config();
 
 //controllers
 module.exports.createNewRestaurantController = async (req, res) => {
-  if ((await checkRestaurantExistence(req.body.email)) === true) {
+  const exists = await checkRestaurantExistence(req.body.email);
+  if (exists) {
     return res.json({
       status: "error",
       message: "restaurant exists",
     });
   } else {
-    const restraunt = await createNewRestaurant(req.body);
-    if (restraunt) {
+    await createNewRestaurant(req.body).then((restaurant) => {
       return res.json({
         status: "success",
         message: "restaurant created",
       });
-    } else {
-      return res.json({
-        status: "error",
-        message: "Failed to create restaurant",
-      });
-    }
+    });
   }
 };
 
@@ -106,7 +101,7 @@ module.exports.updateRestaurantController = async (req, res) => {
 };
 
 module.exports.LoginRestaurantController = async (req, res) => {
-  Restaurant.findOne({ email: req.body.email }).then((restaurant) => {
+  Restaurant.find({ email: req.body.email }).then(([restaurant]) => {
     if (!restaurant) {
       return res.json({
         status: "error",
@@ -117,7 +112,10 @@ module.exports.LoginRestaurantController = async (req, res) => {
         .compare(req.body.password, restaurant.password)
         .then((response) => {
           if (response) {
-            let token = jwt.sign(restaurant._id, `${process.env.SECRET}`);
+            let token = jwt.sign(
+              { id: restaurant._id },
+              `${process.env.SECRET}`
+            );
             return res.json({
               status: "success",
               message: "restaurant logged in",
