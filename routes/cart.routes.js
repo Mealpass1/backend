@@ -1,8 +1,17 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const {addToCartController,getCartDishesController,deleteCartController,editCartontroller,getCartDishesByIdController,getCartDishByIdController} = require('../controllers/cart.controller');
-const {authorizeRole,protectRoute} = require('../middlewares/auth.middleware');
-
+const {
+  addToCartController,
+  getCartDishesController,
+  deleteCartController,
+  editCartontroller,
+  getCartDishesByIdController,
+  getCartDishByIdController,
+} = require("../controllers/cart.controller");
+const {
+  authorizeRole,
+  protectRoute,
+} = require("../middlewares/auth.middleware");
 
 /**
  * @swagger
@@ -17,7 +26,7 @@ const {authorizeRole,protectRoute} = require('../middlewares/auth.middleware');
  *         -quantity
  *         -price
  *         -total
- *         -imgUrl  
+ *         -imgUrl
  *       properties:
  *         id:
  *           type: String
@@ -37,12 +46,12 @@ const {authorizeRole,protectRoute} = require('../middlewares/auth.middleware');
  *         quantity:
  *           type: Number
  *           description: This the qauntity of a dish a user wants to add on cart.
- *           required: true   
+ *           required: true
  *         price:
  *           type: Number
  *           description: This price is selected from dishes model where id==dishId
  *           required: true
- *         
+ *
  *         total:
  *           type: Number,
  *           description: This is the total price of dishes' price and toppings
@@ -50,22 +59,22 @@ const {authorizeRole,protectRoute} = require('../middlewares/auth.middleware');
  *         imgUrl:
  *           type: String,
  *           description: imgUrl is renderd from dishes model where _id==dishId
- *         
+ *
  *         timeOfMeal:
  *           type: String
  *           description: this specifies the time a meal will be ready. lunch,breakfast etc
  *           required: false
- *    
+ *
  *         daysInWeek:
  *           type: Array
  *           description: this is an enum array containing days of week. if you put a value not in this array, it will be error
  *           required: false
- *         
+ *
  *         NumberOfRepetition:
  *           type: String,
  *           description: this specified number of repetition when a dish could be prepared for you
  *           required: false
- * 
+ *
  *         additionalTopping:
  *           type: Array
  *           description: This an array of object containing toppings and their corresponding prices
@@ -90,7 +99,7 @@ const {authorizeRole,protectRoute} = require('../middlewares/auth.middleware');
  *         description: The list of all carts
  *         content:
  *           application/json:
- *             schema: 
+ *             schema:
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Cart'
@@ -107,7 +116,7 @@ const {authorizeRole,protectRoute} = require('../middlewares/auth.middleware');
  *         description: The list of all carts
  *         content:
  *           application/json:
- *             schema: 
+ *             schema:
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Cart'
@@ -134,14 +143,14 @@ const {authorizeRole,protectRoute} = require('../middlewares/auth.middleware');
  *             schema:
  *               $ref: '#/components/schemas/Cart'
  *       400:
- *         description: cart not found 
+ *         description: cart not found
  */
 
 /**
  * @swagger
  * /cart/{id}:
  *   post:
- *     summary: Create a new cart 
+ *     summary: Create a new cart
  *     tags: [Cart]
  *     requestBody:
  *       required: true
@@ -167,17 +176,21 @@ const {authorizeRole,protectRoute} = require('../middlewares/auth.middleware');
  *     summary: Removing  a cart by id
  *     tags: [Cart]
  *     parameters:
- * 
+ *
  */
 
-
-
-router.route('/').get(protectRoute,authorizeRole("normal"),getCartDishesController);
-router.route('/user').get(protectRoute,authorizeRole("normal"),getCartDishesByIdController);
-router.route('/:id').post(protectRoute,authorizeRole("normal"),addToCartController).get(protectRoute,authorizeRole("normal"),getCartDishByIdController)
-.delete(protectRoute,authorizeRole("normal"),deleteCartController);
-router.route('/edit/:id').put(protectRoute,authorizeRole("normal"),editCartontroller);
+router
+  .route("/")
+  .get(protectRoute, authorizeRole("normal"), getCartDishesController);
+router
+  .route("/user")
+  .get(protectRoute, authorizeRole("normal"), getCartDishesByIdController);
+router
+  .route("/:id")
+  .post(protectRoute, authorizeRole("normal"), addToCartController)
+  .get(protectRoute, authorizeRole("normal"), getCartDishByIdController)
+  .delete(protectRoute, authorizeRole("normal"), deleteCartController);
+router
+  .route("/edit/:id")
+  .put(protectRoute, authorizeRole("normal"), editCartontroller);
 exports.cartRoutes = router;
-
-
-
