@@ -9,14 +9,11 @@ const swaggerJsDoc = require("swagger-jsdoc");
 //routes
 const { usersRoutes } = require("./routes/users.routes");
 const { dishesRoutes } = require("./routes/dishes.routes");
-const { dishCategoriesRoutes } = require("./routes/dishCategories.routes");
 const { resetPasswordRoute } = require("./routes/resetPassword.routes");
-const { dishOriginRoutes } = require("./routes/dishOrigins.routes");
 const { paymentRoutes } = require("./routes/payment.routes");
 const { dishSearchRoute } = require("./routes/dishSearch.routes");
 const { restaurantsRoutes } = require("./routes/restaurants.routes");
 const { cartRoutes } = require("./routes/cart.routes");
-const { checkoutRoutes } = require("./routes/checkout.routes");
 
 //configure dotenv
 require("dotenv").config();
