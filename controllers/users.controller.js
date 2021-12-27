@@ -41,6 +41,7 @@ module.exports.UserRegistrationController = async (req, res) => {
 
 module.exports.UserLoginController = async (req, res) => {
   const loggedInUser = await UserLogin(req.body);
+
   if (loggedInUser) {
     const id = loggedInUser._id;
     let payload = { id };
@@ -49,65 +50,77 @@ module.exports.UserLoginController = async (req, res) => {
       expiresIn: 86400,
     });
     res.cookie("jwt", accessToken, { secure: true, httpOnly: true });
-    return res.status(200).send({
-      token: accessToken,
+    return res.json({
+      status: "success",
       message: "Login successful",
+      data: accessToken,
+    });
+  } else {
+    return res.json({
+      status: "error",
+      message: "invalid credentials",
     });
   }
-  return res.status(300).json({
-    message: "invalid credentials",
-    status: false,
-  });
 };
 
 module.exports.deleteUserController = async (req, res) => {
   const deletedUser = await deleteUser(req.params);
   if (deletedUser) {
-    res.status(200).send({ message: "user deleted successfully" });
-    return deletedUser;
+    return res.json({
+      status: "success",
+      message: "user deleted",
+    });
   } else {
-    res.status(400).send({ message: "user deletion failed!" });
-    return;
+    return res.json({
+      status: "error",
+      message: "user not deleted",
+    });
   }
 };
 
 module.exports.getAllUsers = async (req, res) => {
   const users = await getAllUsers();
   if (users) {
-    res.status(200).send({
+    return res.json({
+      status: "success",
       message: "users",
       data: users,
     });
-    return users;
+  } else {
+    return res.json({
+      status: "error",
+      message: "server error",
+    });
   }
-  res.status(404).send({
-    message: "users not found",
-  });
 };
 
 module.exports.getUserById = async (req, res) => {
-  const user = await getUserById(req.params);
-  if (user) {
-    return res.status(200).json({
-      message: "user",
-      data: user,
+  await getUserById(req.params).then((response) => {
+    if (response) {
+      return res.json({
+        status: "success",
+        message: "user",
+        data: response,
+      });
+    }
+    return res.json({
+      status: "error",
+      message: "user not found",
     });
-  }
-  return res.status(404).json({
-    message: "user not found",
   });
 };
 
 module.exports.updateUserController = async (req, res) => {
-  const newUser = await updateUser(req.params.id, req.body);
-  if (newUser) {
-    return res.status(200).json({
-      message: "user updated successfully",
-      data: newUser,
+  await updateUser(req.params.id, req.body).then((response) => {
+    if (response) {
+      return res.json({
+        status: "success",
+        message: "user updated",
+      });
+    }
+    return res.json({
+      status: "error",
+      message: "Failed to update user",
     });
-  }
-  return res.status(400).json({
-    message: "Failed to update user",
-    data: null,
   });
 };
