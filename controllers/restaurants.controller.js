@@ -1,6 +1,8 @@
 //packages
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
+const Restaurant = require("../model/restaurant.model");
+const bcrypt = require("bcrypt");
 
 //services
 const {
@@ -104,18 +106,30 @@ module.exports.updateRestaurantController = async (req, res) => {
 };
 
 module.exports.LoginRestaurantController = async (req, res) => {
-  const response = await LoginRestaurant(req.body);
-  if (response) {
-    let token = jwt.sign(response._id, `${process.env.SECRET}`);
-    return res.json({
-      status: "success",
-      message: "restaurant logged in",
-      data: token,
-    });
-  } else {
-    return res.json({
-      status: "error",
-      message: "invalid email or password",
-    });
-  }
+  Restaurant.findOne({ email: req.body.email }).then((restaurant) => {
+    if (!restaurant) {
+      return res.json({
+        status: "error",
+        message: "invalid email or password",
+      });
+    } else {
+      bcrypt
+        .compare(req.body.password, restaurant.password)
+        .then((response) => {
+          if (response) {
+            let token = jwt.sign(restaurant._id, `${process.env.SECRET}`);
+            return res.json({
+              status: "success",
+              message: "restaurant logged in",
+              data: token,
+            });
+          } else {
+            return res.json({
+              status: "error",
+              message: "invalid email or password",
+            });
+          }
+        });
+    }
+  });
 };
