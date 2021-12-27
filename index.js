@@ -20,7 +20,7 @@ require("dotenv").config();
 
 //configure application
 const app = express();
-const PORT = Number(process.env.PORT) || 3000;
+const PORT = process.env.PORT || 8080;
 
 //configure cors and built in body parser
 app.use(cors());
@@ -29,7 +29,7 @@ app.use(express.urlencoded({ extended: true }));
 
 //connect to database
 mongoose
-  .connect(require("./config/conf").DB, {
+  .connect("mongodb://localhost:27017/mealpass", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
