@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-const Restaurants = require("../model/restaurants.model");
+const Restaurants = require("../model/restaurant.model");
 
 module.exports.createNewRestaurant = async ({
   business_name,
@@ -54,7 +54,7 @@ module.exports.updateRestaurant = async (restraunt_id, newRestraunt) => {
 };
 
 module.exports.LoginRestaurant = async ({ email, password }) => {
-  await Restaurants.findOne({ email: email }).then((restaurant) => {
+  await Restaurants.findOne({ email: email }).then(async (restaurant) => {
     if (!restaurant) {
       return false;
     } else {
