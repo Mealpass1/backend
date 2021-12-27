@@ -1,5 +1,5 @@
 {
-  "name": "mealpassbackend",
+  "name": "mealpass-backend",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -32,7 +32,7 @@
     "q": "^1.5.1",
     "ravepay": "^1.3.0",
     "refresh-token": "^0.1.1",
-    "request": "0.4.2",
+    "request": "^2.88.2",
     "sha.js": "^2.4.11",
     "swagger-jsdoc": "^6.0.0",
     "swagger-ui-express": "^4.1.6",
@@ -41,21 +41,20 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "dev": "nodemon index.js",
-    "proxy": "lcp --proxyUrl https://meal-pass-rw.herukoapp.com"
+    "dev": "nodemon index.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mealpassbackend/mealpassbackend.git"
+    "url": "git+https://github.com/byiringiro-saad/mealpass-backend.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/mealpassbackend/mealpassbackend/issues"
+    "url": "https://github.com/byiringiro-saad/mealpass-backend/issues"
   },
-  "homepage": "https://github.com/mealpassbackend/mealpassbackend#readme",
-  "engines":{
+  "homepage": "https://github.com/byiringiro-saad/mealpass-backend#readme",
+  "engines": {
     "node": "14.x"
   }
 }
