@@ -1,10 +1,12 @@
 //packages
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const dotenv = require("dotenv");
+const User = require("../model/user.model");
 
 //services
 const {
   RegisterUser,
-  UserLogin,
   deleteUser,
   getAllUsers,
   getUserById,
@@ -13,6 +15,9 @@ const {
 
 //helpers
 const { checkUserExistence } = require("../helpers/user.exists");
+
+//configuring dotenv
+dotenv.config();
 
 //controllers
 module.exports.UserRegistrationController = async (req, res) => {
@@ -41,26 +46,35 @@ module.exports.UserRegistrationController = async (req, res) => {
 };
 
 module.exports.UserLoginController = async (req, res) => {
-  const { _id } = await UserLogin(req.body);
-
-  if (loggedInUser) {
-    let payload = { _id };
-    let accessToken = jwt.sign(payload, "swsh23hjddnns", {
-      algorithm: "HS256",
-      expiresIn: 86400,
-    });
-    res.cookie("jwt", accessToken, { secure: true, httpOnly: true });
-    return res.json({
-      status: "success",
-      message: "Login successful",
-      data: accessToken,
-    });
-  } else {
-    return res.json({
-      status: "error",
-      message: "invalid credentials",
-    });
-  }
+  await User.find({ username: req.body.username }).then(async ([user]) => {
+    if (user) {
+      await bcrypt
+        .compare(req.body.password, user.password)
+        .then((response) => {
+          if (response) {
+            let accessToken = jwt.sign(
+              { id: user._id },
+              `${process.env.SECRET}`
+            );
+            return res.json({
+              status: "success",
+              message: "Login successful",
+              data: accessToken,
+            });
+          } else {
+            return res.json({
+              status: "error",
+              message: "invalid credentials",
+            });
+          }
+        });
+    } else {
+      return res.json({
+        status: "error",
+        message: "invalid credentials",
+      });
+    }
+  });
 };
 
 module.exports.deleteUserController = async (req, res) => {
