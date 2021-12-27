@@ -11,32 +11,17 @@ module.exports.RegisterUser = async ({
   password,
 }) => {
   const user = new User();
-  const salt = bcrypt.genSalt(10);
-  await bcrypt.hash(password, salt).then((hashedPassword) => {
-    return new Promise((resolve, _) => {
-      user.fullname = fullname;
-      user.email = email;
-      user.username = username;
-      user.password = hashedPassword;
-      user.save();
-      resolve(user);
-    });
-  });
-};
-
-module.exports.UserLogin = async ({ username, password }) => {
-  await User.findOne({ username: username }).then((user) => {
-    if (!user) {
-      return false;
-    } else {
-      bcrypt.compare(password, user.password).then((response) => {
-        if (!response) {
-          return false;
-        } else {
-          return user;
-        }
+  await bcrypt.genSalt(10, async (err, salt) => {
+    await bcrypt.hash(password, salt).then((hashedPassword) => {
+      return new Promise((resolve, _) => {
+        user.fullname = fullname;
+        user.email = email;
+        user.username = username;
+        user.password = hashedPassword;
+        user.save();
+        resolve(user);
       });
-    }
+    });
   });
 };
 
