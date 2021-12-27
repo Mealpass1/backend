@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const dishSchema = new Schema({
-  restaurant_id: {
-    type: String,
-    required: true,
+  restaurant: {
+    type: mongoose.Types.ObjectId,
+    ref: "Restaurant",
   },
   dishName: {
     type: String,
@@ -29,29 +29,10 @@ const dishSchema = new Schema({
   imageUrl: {
     type: String,
   },
-  discountStatus: {
-    type: String,
-    required: false,
-    default: "off",
-  },
   discountValue: {
     type: Number,
     required: false,
     default: 0,
   },
-  additionalTopping: {
-    type: [
-      {
-        toppingName: {
-          type: String,
-          required: false,
-        },
-        toppingPrice: {
-          type: Number,
-          required: false,
-        },
-      },
-    ],
-  },
 });
-module.exports = mongoose.model("Dishes", dishSchema);
+module.exports = mongoose.model("Dish", dishSchema);
