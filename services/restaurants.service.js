@@ -1,104 +1,70 @@
-const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 const Restaurants = require("../model/restaurants.model");
-const { hashFunction } = require("../utils/hashFunction");
-const { verifyPassword } = require("../utils/verify.password");
 
-module.exports.createNewRestaurant = async (restaurant) => {
-  const restaurants = new Restaurants();
-  const { Business_name, Email, Username, Password, Office_address } =
-    restaurant;
-  const hashedPassword = await hashFunction(Password);
-  restaurants.Business_name = Business_name;
-  restaurants.Email = Email;
-  restaurants.Username = Username;
-  restaurants.Password = hashedPassword;
-  restaurants.Office_address = Office_address;
-  // restaurants.restaurant_desc = restaurant_desc;
-  // restaurants.imgUrl = image.path
-  restaurants.save();
-  // console.log(restaurants)
-  return restaurants;
+module.exports.createNewRestaurant = async ({
+  business_name,
+  email,
+  username,
+  password,
+  location,
+}) => {
+  const salt = bcrypt.genSalt(10);
+  await bcrypt.hash(password, salt).then((hashedPassword) => {
+    const restaurant = new Restaurants({
+      business_name: business_name,
+      email: email,
+      username: username,
+      Password: hashedPassword,
+      location: location,
+    });
+    restaurant.save();
+    return restaurant;
+  });
 };
 
 module.exports.getAllRestaurants = async () => {
-  const restaurants = await Restaurants.find();
-  let data = [];
-  for (resto of restaurants) {
-    let restData = {
-      id: resto._id,
-      business_name: resto.Business_name,
-      address: resto.Office_address,
-      imageUrl: resto.imgUrl,
-      desc: resto.restaurant_desc,
-    };
-    data.push(restData);
-  }
-  return data;
+  const restaurants = await Restaurants.find({});
+  return restaurants;
 };
 
-module.exports.getRestrauntById = async (req) => {
-  const { id } = req;
+module.exports.getRestrauntById = async ({ id }) => {
   const restraunt = await Restaurants.findOne({ _id: id });
-  let restData = {
-    id: restraunt._id,
-    business_name: restraunt.Business_name,
-    address: restraunt.Office_address,
-    imageUrl: restraunt.imgUrl,
-    desc: restraunt.restaurant_desc,
-  };
-  console.log(restData);
-  return restData;
+  return restraunt;
 };
 
-module.exports.deleteRestaurant = async (req) => {
-  const { id } = req;
-  const results = await Restaurants.deleteOne({ _id: id });
-  if (results) {
-    return new Promise((resolve, _) => {
-      resolve(results);
-    });
-  }
+module.exports.deleteRestaurant = async ({ id }) => {
+  await Restaurants.findOneAndRemove({ _id: id }, () => {
+    return true;
+  });
 };
 
 module.exports.updateRestaurant = async (restraunt_id, newRestraunt) => {
-  const { Business_name, Email, Username, Office_address } = newRestraunt;
-  const updatedRestraunt = await Restaurants.findByIdAndUpdate(
-    restraunt_id,
+  await Restaurants.findOneAndUpdate(
+    { _id: restraunt_id },
     newRestraunt,
     {
       new: true,
       runValidators: true,
       useFindAndModify: false,
+    },
+    () => {
+      return true;
     }
   );
-  if (updatedRestraunt) {
-    return new Promise((resolve, _) => {
-      resolve(updatedRestraunt);
-    });
-  }
 };
 
-module.exports.LoginRestaurant = async (req) => {
-  const { Email, Password } = req;
-  const restaurant = await Restaurants.findOne({ Email: Email });
-  if (!restaurant) return false;
-  if (!verifyPassword(Password, restaurant.Password)) return false;
-  return restaurant;
-};
-
-module.exports.restaurantProfile = async (restraunt_id, newRestraunt) => {
-  const updatedRestraunt = await Restaurants.findByIdAndUpdate(
-    restraunt_id,
-    newRestraunt,
-    {
-      new: true,
-      runValidators: true,
-      useFindAndModify: false,
+module.exports.LoginRestaurant = async ({ email, password }) => {
+  await Restaurants.findOne({ email: email }).then((restaurant) => {
+    if (!restaurant) {
+      return false;
+    } else {
+      await bcrypt.compare(password, restaurant.password).then((response) => {
+        if (!response) {
+          return false;
+        } else {
+          return restaurant;
+        }
+      });
     }
-  );
-  if (updatedRestraunt) {
-    return new Promise((resolve, _) => {
-      resolve(updatedRestraunt);
-    });
-  }
+  });
 };
