@@ -1,5 +1,5 @@
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
   fullname: {
@@ -25,12 +25,14 @@ const userSchema = new Schema({
     max: 255,
     min: 8,
   },
-
   role: {
     type: String,
     default: "normal",
-  }
-})
+  },
+  cart: {
+    type: [mongoose.Types.ObjectId],
+    ref: "Cart",
+  },
+});
 
-
-module.exports = mongoose.model('Users', userSchema)
+module.exports = mongoose.model("Users", userSchema);
