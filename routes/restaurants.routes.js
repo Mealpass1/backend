@@ -11,7 +11,6 @@ const {
   deleteRestrauntController,
   updateRestaurantController,
   LoginRestaurantController,
-  restaurantProfileController,
 } = require("../controllers/restaurants.controller");
 const upload = require("../middlewares/upload.middleware");
 /**
@@ -170,12 +169,5 @@ router
     protectRestaurantRoute,
     authorizeRestaurantRole("super admin", "admin"),
     updateRestaurantController
-  );
-router
-  .route("/profile")
-  .put(
-    protectRestaurantRoute,
-    authorizeRestaurantRole("admin"),
-    restaurantProfileController
   );
 exports.restaurantsRoutes = router;
