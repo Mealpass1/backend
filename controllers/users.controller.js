@@ -30,17 +30,10 @@ module.exports.UserRegistrationController = async (req, res) => {
     });
   } else {
     await RegisterUser(req.body).then((response) => {
-      if (response) {
-        return res.json({
-          status: "success",
-          message: "user created",
-        });
-      } else {
-        return res.json({
-          status: "error",
-          message: "server error",
-        });
-      }
+      return res.json({
+        status: "success",
+        message: "user created",
+      });
     });
   }
 };
