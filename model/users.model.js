@@ -30,8 +30,12 @@ const userSchema = new Schema({
     default: "normal",
   },
   cart: {
-    type: [mongoose.Types.ObjectId],
-    ref: "Cart",
+    type: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Cart",
+      },
+    ],
   },
 });
 
