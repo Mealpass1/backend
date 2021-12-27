@@ -53,19 +53,3 @@ module.exports.updateRestaurant = async (restraunt_id, newRestraunt) => {
     }
   );
 };
-
-module.exports.LoginRestaurant = async ({ email, password }) => {
-  await Restaurants.findOne({ email: email }).then(async (restaurant) => {
-    if (!restaurant) {
-      return false;
-    } else {
-      await bcrypt.compare(password, restaurant.password).then((response) => {
-        if (!response) {
-          return false;
-        } else {
-          return restaurant;
-        }
-      });
-    }
-  });
-};
