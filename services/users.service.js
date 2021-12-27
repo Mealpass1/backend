@@ -4,9 +4,13 @@ const bcrypt = require("bcrypt");
 const User = require("../model/user.model");
 
 //services
-module.exports.RegisterUser = async (req) => {
+module.exports.RegisterUser = async ({
+  fullname,
+  email,
+  username,
+  password,
+}) => {
   const user = new User();
-  const { fullname, email, username, password } = req;
   const salt = bcrypt.genSalt(10);
   await bcrypt.hash(password, salt).then((hashedPassword) => {
     return new Promise((resolve, _) => {
@@ -20,8 +24,7 @@ module.exports.RegisterUser = async (req) => {
   });
 };
 
-module.exports.UserLogin = async (req) => {
-  const { username, password } = req;
+module.exports.UserLogin = async ({ username, password }) => {
   await User.findOne({ username: username }).then((user) => {
     if (!user) {
       return false;
@@ -30,15 +33,14 @@ module.exports.UserLogin = async (req) => {
         if (!response) {
           return false;
         } else {
-          return true;
+          return user;
         }
       });
     }
   });
 };
 
-module.exports.deleteUser = async (req) => {
-  const { id } = req;
+module.exports.deleteUser = async ({ id }) => {
   await User.findOneAndRemove({ _id: id }, () => {
     return true;
   });
@@ -51,8 +53,7 @@ module.exports.getAllUsers = () => {
   });
 };
 
-module.exports.getUserById = async (req) => {
-  const { id } = req;
+module.exports.getUserById = async ({ id }) => {
   const user = await User.findOne({ _id: id });
   if (user) {
     return new Promise((resolve, _) => {
