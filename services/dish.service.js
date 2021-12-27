@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const Dishes = require("../model/dish.model");
-const Restaurants = require("../model/restaurants.model");
-const dishCategories = require("../model/dishCategories.model");
+const Restaurants = require("../model/restaurant.model");
 const _ = require("lodash");
 module.exports.createNewDish = async (dishDetails, dishImage, owner) => {
   try {
