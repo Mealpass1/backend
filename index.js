@@ -9,7 +9,7 @@ const swaggerJsDoc = require("swagger-jsdoc");
 //routes
 const { usersRoutes } = require("./routes/users.routes");
 const { dishesRoutes } = require("./routes/dishes.routes");
-const { resetPasswordRoute } = require("./routes/resetPassword.routes");
+// const { resetPasswordRoute } = require("./routes/resetPassword.routes");
 const { paymentRoutes } = require("./routes/payment.routes");
 const { dishSearchRoute } = require("./routes/dishSearch.routes");
 const { restaurantsRoutes } = require("./routes/restaurants.routes");
@@ -76,7 +76,7 @@ app.use("/restaurant", restaurantsRoutes);
 app.use("/dish", dishesRoutes);
 app.use("/search", dishSearchRoute);
 app.use("/cart", cartRoutes);
-app.use("/password-reset", resetPasswordRoute);
+// app.use("/password-reset", resetPasswordRoute);
 app.use("/payment", paymentRoutes);
 
 //swagger api endpoint
