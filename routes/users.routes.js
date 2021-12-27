@@ -1,10 +1,18 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const {UserRegistrationController,UserLoginController,deleteUserController,getAllUsers,getUserById,updateUser} = require('../controllers/users.controller');
-const {protectRoute,authorizeRole} = require('../middlewares/auth.middleware');
-const {headers}  = require('../middlewares/cors.middleware');
-
-
+const {
+  UserRegistrationController,
+  UserLoginController,
+  deleteUserController,
+  getAllUsers,
+  getUserById,
+  updateUser,
+} = require("../controllers/users.controller");
+const {
+  protectRoute,
+  authorizeRole,
+} = require("../middlewares/auth.middleware");
+const { headers } = require("../middlewares/cors.middleware");
 
 /**
  * @swagger
@@ -67,7 +75,7 @@ const {headers}  = require('../middlewares/cors.middleware');
  *         description: The list of all users
  *         content:
  *           application/json:
- *             schema: 
+ *             schema:
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Users'
@@ -94,14 +102,14 @@ const {headers}  = require('../middlewares/cors.middleware');
  *             schema:
  *               $ref: '#/components/schemas/User'
  *       400:
- *         description: user not found 
+ *         description: user not found
  */
 
 /**
  * @swagger
  * /user/signup:
  *   post:
- *     summary: Create a new user 
+ *     summary: Create a new user
  *     tags: [Users]
  *     requestBody:
  *       required: true
@@ -119,7 +127,6 @@ const {headers}  = require('../middlewares/cors.middleware');
  *       500:
  *         description:  Server error
  */
-
 
 /**
  * @swagger
@@ -144,8 +151,6 @@ const {headers}  = require('../middlewares/cors.middleware');
  *         description:  Server error
  */
 
-
-
 /**
  * @swagger
  * /user/{id}:
@@ -153,12 +158,20 @@ const {headers}  = require('../middlewares/cors.middleware');
  *     summary: Removing  a user by id
  *     tags: [Users]
  *     parameters:
- * 
+ *
  */
 
-
-router.route('/').get(protectRoute,authorizeRole("admin","super admin"),getAllUsers);
-router.route('/signup').post(UserRegistrationController);
-router.route('/login').post(UserLoginController);
-router.route('/:id',).delete(protectRoute,authorizeRole("normal","super admin"),deleteUserController).get(protectRoute,authorizeRole("normal","super admin"),getUserById);
+router
+  .route("/")
+  .get(protectRoute, authorizeRole("admin", "super admin"), getAllUsers);
+router.route("/signup").post(UserRegistrationController);
+router.route("/login").post(UserLoginController);
+router
+  .route("/:id")
+  .delete(
+    protectRoute,
+    authorizeRole("normal", "super admin"),
+    deleteUserController
+  )
+  .get(protectRoute, authorizeRole("normal", "super admin"), getUserById);
 exports.usersRoutes = router;
