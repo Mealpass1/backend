@@ -8,17 +8,18 @@ module.exports.createNewRestaurant = async ({
   password,
   location,
 }) => {
-  const salt = bcrypt.genSalt(10);
-  await bcrypt.hash(password, salt).then((hashedPassword) => {
-    const restaurant = new Restaurants({
-      business_name: business_name,
-      email: email,
-      username: username,
-      Password: hashedPassword,
-      location: location,
+  await bcrypt.genSalt(10, async (err, salt) => {
+    await bcrypt.hash(password, salt).then((hashedPassword) => {
+      const restaurant = new Restaurants({
+        business_name: business_name,
+        email: email,
+        username: username,
+        Password: hashedPassword,
+        location: location,
+      });
+      restaurant.save();
+      return restaurant;
     });
-    restaurant.save();
-    return restaurant;
   });
 };
 
