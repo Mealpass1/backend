@@ -6,7 +6,7 @@ const {
   updateRestaurant,
   LoginRestaurant,
   restaurantProfile,
-} = require("../services/restaurants.services");
+} = require("../services/restaurants.service");
 const jwt = require("jsonwebtoken");
 const { checkRestaurantExistence } = require("../helpers/restaurant.exists");
 
