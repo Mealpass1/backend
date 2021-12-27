@@ -2,7 +2,6 @@
 const bcrypt = require("bcrypt");
 
 const User = require("../model/user.model");
-const { verifyPassword } = require("../utils/verify.password");
 
 //services
 module.exports.RegisterUser = async (req) => {
@@ -23,10 +22,19 @@ module.exports.RegisterUser = async (req) => {
 
 module.exports.UserLogin = async (req) => {
   const { username, password } = req;
-  const user = await User.findOne({ username: username });
-  if (!user) return false;
-  if (!verifyPassword(password, user.password)) return false;
-  return user;
+  await User.findOne({ username: username }).then((user) => {
+    if (!user) {
+      return false;
+    } else {
+      bcrypt.compare(password, user.password).then((response) => {
+        if (!response) {
+          return false;
+        } else {
+          return true;
+        }
+      });
+    }
+  });
 };
 
 module.exports.deleteUser = async (req) => {
@@ -55,7 +63,6 @@ module.exports.getUserById = async (req) => {
 };
 
 module.exports.updateUser = async (userId, newUser) => {
-  const { fullname, email, username } = newUser;
   const updatedUser = await User.findByIdAndUpdate(userId, newUser, {
     new: true,
     runValidators: true,
