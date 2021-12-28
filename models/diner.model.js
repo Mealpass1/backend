@@ -22,6 +22,21 @@ const dinerSchema = new Schema({
   cart: {
     type: [{ type: mongoose.Types.ObjectId, ref: "Dish" }],
   },
+  status: {
+    type: String,
+    enum: ["online", "offline"],
+  },
+  purchases: {
+    type: Number,
+    default: 0,
+  },
+  createdAt: {
+    type: Date,
+    required: true,
+  },
+  lastLogin: {
+    type: Date,
+  },
 });
 
 module.exports = mongoose.model("Diner", dinerSchema);
