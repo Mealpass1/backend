@@ -28,7 +28,15 @@ const auth = async (req, res, next) => {
                 message: "account doesn't exists",
               });
             } else {
-              next();
+              if (diner.status == "offline") {
+                return res.json({
+                  status: "error",
+                  message: "please login to continue",
+                });
+              } else {
+                req.diner = diner;
+                next();
+              }
             }
           });
         }
