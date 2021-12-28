@@ -10,6 +10,9 @@ const dinerRoutes = require("./routes/diner.routes");
 //initialize app
 const app = express();
 
+//databse
+require("./services/db.service");
+
 //some configurations
 app.use(cors());
 app.use(bodyParser.json());
