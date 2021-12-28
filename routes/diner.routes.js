@@ -1,10 +1,19 @@
 const express = require("express");
 
-const { signup, login } = require("../controllers/diner.controllers");
+const authMiddleware = require("../middlewares/diner.auth");
+
+const {
+  signup,
+  login,
+  logout,
+  allDiners,
+} = require("../controllers/diner.controllers");
 
 const router = express.Router();
 
 router.post("/signup", signup);
 router.post("/login", login);
+router.put("/logout/:id", authMiddleware, logout);
+router.get("/", allDiners);
 
 module.exports = router;
