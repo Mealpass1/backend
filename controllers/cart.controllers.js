@@ -160,5 +160,5 @@ const cartSchema = joi.object().keys({
   timeOfMeal: joi.string().required(),
   daysInWeek: joi.array().required(),
   deliveryMode: joi.string().required(),
-  repeatesInMonth: joi.Number().required(),
+  repeatesInMonth: joi.number().required(),
 });
