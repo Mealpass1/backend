@@ -45,6 +45,7 @@ exports.signup = async (req, res) => {
                     email: data.email,
                     username: data.username,
                     password: hashedPassword,
+                    createdAt: Date.now(),
                   });
                   await diner
                     .save()
@@ -102,12 +103,30 @@ exports.login = async (req, res) => {
               message: "invalid email or password",
             });
           } else {
-            const token = jwt.sign({ id: diner._id }, `${process.env.SECRET}`);
-            return res.json({
-              status: "success",
-              message: "diner logged in",
-              data: token,
-            });
+            Diner.findOneAndUpdate(
+              { _id: diner._id },
+              {
+                status: "online",
+                lastLogin: Date.now(),
+              }
+            )
+              .then((response) => {
+                const token = jwt.sign(
+                  { id: diner._id },
+                  `${process.env.SECRET}`
+                );
+                return res.json({
+                  status: "success",
+                  message: "diner logged in",
+                  data: token,
+                });
+              })
+              .catch((err) => {
+                return res.json({
+                  status: "error",
+                  message: err.message,
+                });
+              });
           }
         })
         .catch((err) => {
@@ -118,6 +137,45 @@ exports.login = async (req, res) => {
         });
     }
   });
+};
+
+exports.logout = async (req, res) => {
+  const data = {
+    id: req.params.id,
+  };
+
+  await Diner.findByIdAndUpdate(data.id, {
+    status: "offline",
+  })
+    .then((response) => {
+      return res.json({
+        status: "success",
+        message: "diner logged out",
+      });
+    })
+    .catch((err) => {
+      return res.json({
+        status: "error",
+        message: err.message,
+      });
+    });
+};
+
+exports.allDiners = async (req, res) => {
+  await Diner.find({})
+    .then((diners) => {
+      return res.json({
+        status: "success",
+        message: "all diners",
+        data: diners,
+      });
+    })
+    .catch((err) => {
+      return res.json({
+        status: "error",
+        message: err.message,
+      });
+    });
 };
 
 const dinerSchema = joi.object().keys({
