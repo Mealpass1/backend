@@ -35,4 +35,4 @@ const sendEmail = (email, names) => {
   });
 };
 
-export default sendEmail;
+module.exports = sendEmail;
