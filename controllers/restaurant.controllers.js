@@ -73,6 +73,8 @@ exports.signup = async (req, res) => {
   }
 };
 
+exports.login = (req, res) => {};
+
 const restaurantSchema = joi.object().keys({
   businessName: joi.string().required(),
   email: joi.string().email().required(),
