@@ -7,6 +7,7 @@ const dotenv = require("dotenv").config();
 //files
 const dinerRoutes = require("./routes/diner.routes");
 const cartRoutes = require("./routes/cart.routes");
+const restaurantRoutes = require("./routes/restaurant.routes");
 
 //initialize app
 const app = express();
@@ -22,6 +23,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //base endpoints
 app.use("/diner", dinerRoutes);
 app.use("/cart", cartRoutes);
+app.use("/restaurant", restaurantRoutes);
 
 //start the server
 const PORT = process.env.PORT || 8080;
