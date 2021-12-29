@@ -1,4 +1,5 @@
 const joi = require("joi");
+const bcrypt = require("bcrypt");
 
 const Restaurant = require("../models/restaurant.model");
 
@@ -24,6 +25,48 @@ exports.signup = async (req, res) => {
         return res.json({
           status: "error",
           message: "restaurant already exists",
+        });
+      } else {
+        bcrypt.genSalt(10, (err, salt) => {
+          if (err) {
+            return res.json({
+              status: "error",
+              message: err.message,
+            });
+          } else {
+            bcrypt
+              .hash(data.password, salt)
+              .then(async (hashedPassword) => {
+                const restaurant = new Restaurant({
+                  businessName: data.businessName,
+                  email: data.email,
+                  username: data.username,
+                  password: data.password,
+                  address: data.address,
+                  createdAt: Date.now(),
+                });
+                await restaurant
+                  .save()
+                  .then((response) => {
+                    return res.json({
+                      status: "success",
+                      message: "restaurant created",
+                    });
+                  })
+                  .catch((err) => {
+                    return res.json({
+                      status: "error",
+                      message: "restaurant already exists",
+                    });
+                  });
+              })
+              .catch((err) => {
+                return res.json({
+                  status: "error",
+                  message: "restaurant already exists",
+                });
+              });
+          }
         });
       }
     });
