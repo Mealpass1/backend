@@ -31,7 +31,7 @@ exports.signup = async (req, res) => {
             message: "user exists",
           });
         } else {
-          await bcrypt.genSalt(10, (err, salt) => {
+          bcrypt.genSalt(10, (err, salt) => {
             if (err) {
               return res.json({
                 status: "error",
