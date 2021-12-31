@@ -13,13 +13,33 @@ const orderSchema = new Schema({
     ref: "Restaurant",
     required: true,
   },
-  cart: {
-    type: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "Cart",
-      },
-    ],
+  dish: {
+    type: mongoose.Types.ObjectId,
+    ref: "Dish",
+    required: true,
+  },
+  quantity: {
+    type: Number,
+    required: true,
+  },
+  timeOfMeal: {
+    type: String,
+    required: true,
+  },
+  daysInWeek: {
+    type: [String],
+    required: true,
+  },
+  deliveryMode: {
+    type: String,
+    required: true,
+  },
+  repeatsInMonth: {
+    type: Number,
+    required: true,
+  },
+  mealServing: {
+    type: Number,
     required: true,
   },
   status: {
@@ -34,5 +54,19 @@ const orderSchema = new Schema({
     type: Date,
   },
 });
+
+orderSchema.methods.addOrders = ({ restaurant, cart }, diner) => {
+  for (let item of cart) {
+    const order = new mongoose.model("Order");
+    order.diner = diner;
+    order.restaurant = restaurant;
+    order.cart = item;
+    order.createdAt = Date.now();
+    order.save();
+  }
+  return new Promise((resolve, reject) => {
+    resolve("done");
+  });
+};
 
 module.exports = mongoose.model("Order", orderSchema);
