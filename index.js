@@ -10,6 +10,7 @@ const cartRoutes = require("./routes/cart.routes");
 const restaurantRoutes = require("./routes/restaurant.routes");
 const dishRoutes = require("./routes/dish.routes");
 const orderRoutes = require("./routes/order.routes");
+const menuRoutes = require("./routes/menu.routes");
 
 //initialize app
 const app = express();
@@ -28,6 +29,7 @@ app.use("/cart", cartRoutes);
 app.use("/restaurant", restaurantRoutes);
 app.use("/dish", dishRoutes);
 app.use("/order", orderRoutes);
+app.use("/menu", menuRoutes);
 
 //start the server
 const PORT = process.env.PORT || 8080;
