@@ -42,31 +42,12 @@ const orderSchema = new Schema({
     type: Number,
     required: true,
   },
-  status: {
-    type: String,
-    enum: ["pending", "completed"],
-    default: "pending",
-  },
-  handledAt: {
+  finishedAt: {
     type: Date,
   },
   createdAt: {
     type: Date,
   },
 });
-
-orderSchema.methods.addOrders = ({ restaurant, cart }, diner) => {
-  for (let item of cart) {
-    const order = new mongoose.model("Order");
-    order.diner = diner;
-    order.restaurant = restaurant;
-    order.cart = item;
-    order.createdAt = Date.now();
-    order.save();
-  }
-  return new Promise((resolve, reject) => {
-    resolve("done");
-  });
-};
 
 module.exports = mongoose.model("Order", orderSchema);
