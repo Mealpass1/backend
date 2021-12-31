@@ -180,6 +180,24 @@ exports.allDiners = async (req, res) => {
     });
 };
 
+exports.oneDiner = async (req, res) => {
+  await Diner.findById(req.params.id)
+    .exec()
+    .then((diner) => {
+      return res.json({
+        status: "success",
+        message: "one diner",
+        data: diner,
+      });
+    })
+    .catch((err) => {
+      return res.json({
+        status: "error",
+        message: err.message,
+      });
+    });
+};
+
 const dinerSchema = joi.object().keys({
   fullname: joi.string().required(),
   email: joi.string().email().required(),
