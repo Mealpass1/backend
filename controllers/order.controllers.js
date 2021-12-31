@@ -31,7 +31,9 @@ exports.create = async (req, res) => {
             restaurant: response.restaurant,
             createdAt: Date.now(),
           });
-          await menu.save();
+          await menu.save().then(async (response) => {
+            await Cart.findByIdAndRemove(item.cart, {});
+          });
         });
       });
     }
@@ -46,4 +48,21 @@ exports.create = async (req, res) => {
       message: error.message,
     });
   }
+};
+
+exports.allOrders = async (req, res) => {
+  await Order.find({ restaurant: req.restaurant._id })
+    .then((orders) => {
+      return res.json({
+        status: "success",
+        message: "all orders",
+        data: orders,
+      });
+    })
+    .catch((err) => {
+      return res.json({
+        status: "error",
+        message: err.message,
+      });
+    });
 };
