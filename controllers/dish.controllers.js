@@ -57,7 +57,6 @@ exports.createDish = async (req, res) => {
 
 exports.allDishes = async (req, res) => {
   await Dish.find({})
-    .exec()
     .then((dishes) => {
       return res.json({
         status: "success",
@@ -75,7 +74,6 @@ exports.allDishes = async (req, res) => {
 
 exports.oneDish = async (req, res) => {
   await Dish.findById(req.params.id)
-    .exec()
     .then((dish) => {
       return res.json({
         status: "success",
