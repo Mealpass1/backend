@@ -157,7 +157,6 @@ exports.logout = async (req, res) => {
 
 exports.allRestaurants = async (req, res) => {
   await Restaurant.find({})
-    .exec()
     .populate("dishes")
     .then((restaurants) => {
       return res.json({
@@ -176,7 +175,6 @@ exports.allRestaurants = async (req, res) => {
 
 exports.oneRestaurant = async (req, res) => {
   await Restaurant.findById(req.params.id)
-    .exec()
     .then((restaurant) => {
       return res.json({
         status: "success",
@@ -194,7 +192,6 @@ exports.oneRestaurant = async (req, res) => {
 
 exports.dishes = async (req, res) => {
   await Dish.find({ restaurant: req.restaurant._id })
-    .exec()
     .then((dishes) => {
       return res.json({
         status: "success",
