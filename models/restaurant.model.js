@@ -35,7 +35,7 @@ const restaurantSchema = new Schema({
     type: String,
     required: false,
     default:
-      "https://res.cloudinary.com/f-studios/image/upload/v1640771083/png-clipart-spoon-and-fork-logo-monumental-restaurant-logo-cafe-others-miscellaneous-food_qez1kd.png",
+      "https://res.cloudinary.com/f-studios/image/upload/v1640983800/mealpass/restaurant_c96woi.png",
   },
   revenue: {
     type: Number,
