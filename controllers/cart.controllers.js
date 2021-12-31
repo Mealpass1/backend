@@ -62,7 +62,6 @@ exports.addDish = async (req, res) => {
 
 exports.getAll = async (req, res) => {
   await Cart.find({ diner: req.diner._id })
-    .exec()
     .populate("dish", "restaurant")
     .then((items) => {
       return res.json({
