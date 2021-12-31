@@ -22,20 +22,41 @@ const menuSchema = new Schema({
   createdAt: {
     type: Date,
   },
+  used: {
+    type: Boolean,
+    default: false,
+  },
+  shared: {
+    type: Boolean,
+    default: false,
+  },
+  usage: {
+    type: [
+      {
+        date: {
+          type: Date,
+        },
+        quantity: {
+          type: Number,
+        },
+      },
+    ],
+  },
+  sharing: {
+    type: [
+      {
+        date: {
+          type: Date,
+        },
+        to: {
+          type: String,
+        },
+        quantity: {
+          type: Number,
+        },
+      },
+    ],
+  },
 });
-
-menuSchema.methods.addMenu = ({ restaurant, cart }, diner) => {
-  for (let item of cart) {
-    const menu = new mongoose.model("Menu");
-    menu.diner = diner;
-    menu.restaurant = restaurant;
-    menu.cart = item;
-    menu.createdAt = Date.now();
-    menu.save();
-  }
-  return new Promise((resolve, reject) => {
-    resolve("done");
-  });
-};
 
 module.exports = mongoose.model("Menu", menuSchema);
