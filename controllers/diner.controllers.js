@@ -182,7 +182,6 @@ exports.allDiners = async (req, res) => {
 
 exports.oneDiner = async (req, res) => {
   await Diner.findById(req.params.id)
-    .exec()
     .then((diner) => {
       return res.json({
         status: "success",
