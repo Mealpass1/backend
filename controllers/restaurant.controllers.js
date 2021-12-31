@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const Restaurant = require("../models/restaurant.model");
+const Dish = require("../models/dish.model");
 
 exports.signup = async (req, res) => {
   const data = {
@@ -154,13 +155,51 @@ exports.logout = async (req, res) => {
     });
 };
 
-exports.allRestaurants = (req, res) => {
+exports.allRestaurants = async (req, res) => {
   await Restaurant.find({})
+    .exec()
+    .populate("dishes")
     .then((restaurants) => {
       return res.json({
         status: "success",
         message: "all restaurants",
         data: restaurants,
+      });
+    })
+    .catch((err) => {
+      return res.json({
+        status: "error",
+        message: err.message,
+      });
+    });
+};
+
+exports.oneRestaurant = async (req, res) => {
+  await Restaurant.findById(req.params.id)
+    .exec()
+    .then((restaurant) => {
+      return res.json({
+        status: "success",
+        message: "one restaurant",
+        data: restaurant,
+      });
+    })
+    .catch((err) => {
+      return res.json({
+        status: "error",
+        message: err.message,
+      });
+    });
+};
+
+exports.dishes = async (req, res) => {
+  await Dish.find({ restaurant: req.restaurant._id })
+    .exec()
+    .then((dishes) => {
+      return res.json({
+        status: "success",
+        message: "all dishes",
+        data: dishes,
       });
     })
     .catch((err) => {
