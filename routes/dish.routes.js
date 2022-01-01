@@ -8,11 +8,14 @@ const {
 
 const authMiddleware = require("../middlewares/restaurant.auth");
 
-const upload = require("../services/imageUpload.service");
+const upload = require("../services/image.service");
 
 const router = express.Router();
 
-router.post("/add", authMiddleware, upload.single("picture"), createDish);
+router.post("/add", authMiddleware, upload.single("picture"), (req, res) => {
+  res.send(req.file);
+});
+
 router.get("/", allDishes);
 router.get("/:id", oneDish);
 
