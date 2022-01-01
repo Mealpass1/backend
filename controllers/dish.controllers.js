@@ -1,7 +1,11 @@
 const Dish = require("../models/dish.model");
 const Restaurant = require("../models/restaurant.model");
 
+const { uploads } = require("../services/cloudinary.service");
+
 exports.createDish = async (req, res) => {
+  const uploader = async (path) => await uploads(path, "mealpass");
+
   const data = {
     name: req.body.name,
     price: req.body.price,
@@ -17,42 +21,44 @@ exports.createDish = async (req, res) => {
     });
   }
 
-  const dish = new Dish({
-    restaurant: req.restaurant._id,
-    name: data.name,
-    price: data.price,
-    description: data.description,
-    discount: data.discount,
-    category: data.category,
-    image: data.image,
-    createdAt: Date.now(),
-  });
-
-  await dish
-    .save()
-    .then(async (response) => {
-      await Restaurant.findByIdAndUpdate(req.restaurant._id, {
-        $push: { dishes: response._id },
-      })
-        .then((response) => {
-          return res.json({
-            status: "success",
-            message: "dish created",
-          });
-        })
-        .catch((err) => {
-          return res.json({
-            status: "error",
-            message: err.message,
-          });
-        });
-    })
-    .catch((err) => {
-      return res.json({
-        status: "error",
-        message: err.message,
-      });
+  await uploader(data.image).then(async (url) => {
+    const dish = new Dish({
+      restaurant: req.restaurant._id,
+      name: data.name,
+      price: data.price,
+      description: data.description,
+      discount: data.discount,
+      category: data.category,
+      image: url,
+      createdAt: Date.now(),
     });
+
+    await dish
+      .save()
+      .then(async (response) => {
+        await Restaurant.findByIdAndUpdate(req.restaurant._id, {
+          $push: { dishes: response._id },
+        })
+          .then((response) => {
+            return res.json({
+              status: "success",
+              message: "dish created",
+            });
+          })
+          .catch((err) => {
+            return res.json({
+              status: "error",
+              message: err.message,
+            });
+          });
+      })
+      .catch((err) => {
+        return res.json({
+          status: "error",
+          message: err.message,
+        });
+      });
+  });
 };
 
 exports.allDishes = async (req, res) => {
