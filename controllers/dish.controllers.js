@@ -12,7 +12,7 @@ exports.createDish = async (req, res) => {
     description: req.body.description,
     discount: req.body.discount,
     category: req.body.category,
-    image: req.file.path,
+    // image: req.file.path,
   };
 
   if (!req.restaurant.dishTypes.includes(data.category)) {
@@ -21,48 +21,48 @@ exports.createDish = async (req, res) => {
     });
   }
 
-  await uploader(data.image).then(async (url) => {
-    const dish = new Dish({
-      restaurant: req.restaurant._id,
-      name: data.name,
-      price: data.price,
-      description: data.description,
-      discount: data.discount,
-      category: data.category,
-      image: url,
-      createdAt: Date.now(),
-    });
-
-    await dish
-      .save()
-      .then(async (response) => {
-        await Restaurant.findByIdAndUpdate(req.restaurant._id, {
-          $push: { dishes: response._id },
-        })
-          .then((response) => {
-            return res.json({
-              status: "success",
-              message: "dish created",
-            });
-          })
-          .catch((err) => {
-            return res.json({
-              status: "error",
-              message: err.message,
-            });
-          });
-      })
-      .catch((err) => {
-        return res.json({
-          status: "error",
-          message: err.message,
-        });
-      });
+  // await uploader(data.image).then(async (url) => {
+  const dish = new Dish({
+    restaurant: req.restaurant._id,
+    name: data.name,
+    price: data.price,
+    description: data.description,
+    discount: data.discount,
+    category: data.category,
+    image: "none",
+    createdAt: Date.now(),
   });
+
+  await dish
+    .save()
+    .then(async (response) => {
+      await Restaurant.findByIdAndUpdate(req.restaurant._id, {
+        $push: { dishes: response._id },
+      })
+        .then((response) => {
+          return res.json({
+            status: "success",
+            message: "dish created",
+          });
+        })
+        .catch((err) => {
+          return res.json({
+            status: "error",
+            message: err.message,
+          });
+        });
+    })
+    .catch((err) => {
+      return res.json({
+        status: "error",
+        message: err.message,
+      });
+    });
+  // });
 };
 
 exports.allDishes = async (req, res) => {
-  await Dish.find({})
+  await Dish.find({ restaurant: req.restaurant._id })
     .then((dishes) => {
       return res.json({
         status: "success",
