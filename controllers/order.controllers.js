@@ -32,17 +32,13 @@ exports.create = async (req, res) => {
             createdAt: Date.now(),
           });
           await menu.save().then(async (response) => {
-            await Cart.findByIdAndRemove(item.cart, {}).then(
-              async (response) => {
-                await Dish.findByIdAndUpdate(item.dish, {
-                  stats: {
-                    unused: cart.mealServing,
-                  },
-                  $inc: { sales: { diners: 1 } },
-                  $inc: { sales: { money: cart.subTotal } },
-                });
-              }
-            );
+            await Dish.findByIdAndUpdate(item.dish, {
+              $inc: { "stats.unused": parseInt(cart.mealServing) },
+              $inc: { "sales.diners": 1 },
+              $inc: { "sales.money": parseInt(cart.subTotal) },
+            }).then(async (response) => {
+              await Cart.findByIdAndRemove(item.cart);
+            });
           });
         });
       });
