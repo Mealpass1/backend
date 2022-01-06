@@ -10,6 +10,7 @@ exports.addDish = async (req, res) => {
     daysInWeek: req.body.daysInWeek,
     deliveryMode: req.body.deliveryMode,
     repeatesInMonth: req.body.repeatesInMonth,
+    price: req.body.price,
   };
 
   const { error } = cartSchema.validate(data);
@@ -32,6 +33,11 @@ exports.addDish = async (req, res) => {
       mealServing:
         data.quantity * data.daysInWeek.length * data.repeatesInMonth,
       createdAt: Date.now(),
+      subTotal:
+        data.quantity *
+        data.daysInWeek.length *
+        data.repeatesInMonth *
+        data.price,
     });
     await cart
       .save()
@@ -158,10 +164,29 @@ exports.updateMealServing = async (req, res) => {
     });
 };
 
+exports.oneDish = async (req, res) => {
+  await Cart.findById(req.params.id)
+    .populate("dish")
+    .then((item) => {
+      return res.json({
+        status: "success",
+        message: "cart item",
+        data: item,
+      });
+    })
+    .catch((err) => {
+      return res.json({
+        status: "error",
+        message: err.message,
+      });
+    });
+};
+
 const cartSchema = joi.object().keys({
   quantity: joi.number().required(),
   timeOfMeal: joi.string().required(),
   daysInWeek: joi.array().required(),
   deliveryMode: joi.string().required(),
   repeatesInMonth: joi.number().required(),
+  price: joi.number().required(),
 });
