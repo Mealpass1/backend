@@ -6,7 +6,7 @@ const {
   logout,
   allRestaurants,
   oneRestaurant,
-  dishes,
+  update,
 } = require("../controllers/restaurant.controllers");
 
 const authMiddleware = require("../middlewares/restaurant.auth");
@@ -15,9 +15,9 @@ const router = express.Router();
 
 router.post("/signup", signup);
 router.post("/login", login);
-router.put("/logout/:id", authMiddleware, logout);
+router.put("/logout", authMiddleware, logout);
 router.get("/", allRestaurants);
-router.get("/:id", authMiddleware, oneRestaurant);
-router.get("/dishes", authMiddleware, dishes);
+router.get("/:id", oneRestaurant);
+router.put("/update/:id", authMiddleware, update);
 
 module.exports = router;
