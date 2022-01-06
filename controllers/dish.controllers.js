@@ -1,5 +1,9 @@
 const Dish = require("../models/dish.model");
 const Restaurant = require("../models/restaurant.model");
+const Menu = require("../models/menu.model");
+const Cart = require("../models/cart.model");
+
+const cloudinary = require("cloudinary").v2;
 
 exports.createDish = async (req, res) => {
   const data = {
@@ -80,6 +84,63 @@ exports.oneDish = async (req, res) => {
         message: "one dish",
         data: dish,
       });
+    })
+    .catch((err) => {
+      return res.json({
+        status: "error",
+        message: err.message,
+      });
+    });
+};
+
+exports.deleteDish = async (req, res) => {
+  await Dish.findById(req.params.id)
+    .then(async (dish) => {
+      if (dish?.stats?.unused > 0) {
+        return res.json({
+          status: "error",
+          message: "dish can't be deleted",
+        });
+      } else {
+        await Dish.findByIdAndRemove(dish?._id, async (err, item) => {
+          if (err) {
+            return res.json({
+              status: "error",
+              message: err.message,
+            });
+          } else {
+            cloudinary.uploader.destroy(dish?.image?.split(".")[0]);
+            await Cart.findOneAndRemove(
+              { dish: dish?._id },
+              async (err, item) => {
+                if (err) {
+                  return res.json({
+                    status: "error",
+                    message: err.message,
+                  });
+                } else {
+                  await Menu.findOneAndRemove(
+                    { dish: dish?._id },
+                    async (err, item) => {
+                      if (err) {
+                        return res.json({
+                          status: "error",
+                          message: err.message,
+                        });
+                      } else {
+                        return res.json({
+                          status: "success",
+                          message: "Dish deleted",
+                        });
+                      }
+                    }
+                  );
+                }
+              }
+            );
+          }
+        });
+      }
     })
     .catch((err) => {
       return res.json({
