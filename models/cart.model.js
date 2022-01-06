@@ -39,6 +39,10 @@ const cartSchema = new Schema({
     type: Number,
     required: true,
   },
+  subTotal: {
+    type: Number,
+    default: 0,
+  },
   createdAt: {
     type: Date,
     required: true,
