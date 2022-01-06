@@ -4,7 +4,6 @@ const Cart = require("../models/cart.model");
 
 exports.create = async (req, res) => {
   const data = {
-    restaurant: req.body.restaurant,
     array: req.body.array,
   };
 
@@ -13,13 +12,13 @@ exports.create = async (req, res) => {
       await Cart.findById(item.cart).then(async (cart) => {
         const order = new Order({
           diner: req.diner._id,
-          restaurant: data.restaurant,
+          restaurant: item.restaurant,
           dish: item.dish,
           quantity: cart.quantity,
           timeOfMeal: cart.timeOfMeal,
           daysInWeek: cart.daysInWeek,
           deliveryMode: cart.deliveryMode,
-          repeatesInMonth: cart.repeatesInMonth,
+          repeatsInMonth: cart.repeatsInMonth,
           mealServing: cart.mealServing,
           createdAt: Date.now(),
         });
@@ -57,6 +56,23 @@ exports.allOrders = async (req, res) => {
         status: "success",
         message: "all orders",
         data: orders,
+      });
+    })
+    .catch((err) => {
+      return res.json({
+        status: "error",
+        message: err.message,
+      });
+    });
+};
+
+exports.oneOrder = async (req, res) => {
+  await Order.findById(req.params.id)
+    .then((order) => {
+      return res.json({
+        status: "success",
+        message: "one order",
+        data: order,
       });
     })
     .catch((err) => {
