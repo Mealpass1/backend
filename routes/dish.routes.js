@@ -4,6 +4,7 @@ const {
   createDish,
   allDishes,
   oneDish,
+  deleteDish,
 } = require("../controllers/dish.controllers");
 
 const authMiddleware = require("../middlewares/restaurant.auth");
@@ -15,5 +16,6 @@ const router = express.Router();
 router.post("/add", authMiddleware, upload.single("picture"), createDish);
 router.get("/", authMiddleware, allDishes);
 router.get("/:id", oneDish);
+router.delete("/:id", authMiddleware, deleteDish);
 
 module.exports = router;
