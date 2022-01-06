@@ -134,11 +134,7 @@ exports.login = async (req, res) => {
 };
 
 exports.logout = async (req, res) => {
-  const data = {
-    id: req.params.id,
-  };
-
-  await Restaurant.findByIdAndUpdate(data.id, {
+  await Restaurant.findByIdAndUpdate(req.restaurant._id, {
     status: "offline",
   })
     .then((response) => {
@@ -174,7 +170,9 @@ exports.allRestaurants = async (req, res) => {
 };
 
 exports.oneRestaurant = async (req, res) => {
+  console.log("done");
   await Restaurant.findById(req.params.id)
+    .populate("dishes")
     .then((restaurant) => {
       return res.json({
         status: "success",
@@ -190,13 +188,29 @@ exports.oneRestaurant = async (req, res) => {
     });
 };
 
-exports.dishes = async (req, res) => {
-  await Dish.find({ restaurant: req.restaurant._id })
-    .then((dishes) => {
+exports.update = async (req, res) => {
+  const data = {
+    businessName: req.body.businessName,
+    email: req.body.email,
+    username: req.body.username,
+    password: req.body.password,
+    address: req.body.address,
+    phone: req.body.phone,
+    description: req.body.description,
+  };
+  Restaurant.findByIdAndUpdate(req.restaurant._id, {
+    businessName: data.businessName,
+    email: data.email,
+    username: data.username,
+    password: data.password,
+    address: data.address,
+    phone: data.phone,
+    description: data.description,
+  })
+    .then((result) => {
       return res.json({
         status: "success",
-        message: "all dishes",
-        data: dishes,
+        message: "updated",
       });
     })
     .catch((err) => {
