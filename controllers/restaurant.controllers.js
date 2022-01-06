@@ -170,7 +170,6 @@ exports.allRestaurants = async (req, res) => {
 };
 
 exports.oneRestaurant = async (req, res) => {
-  console.log("done");
   await Restaurant.findById(req.params.id)
     .populate("dishes")
     .then((restaurant) => {
