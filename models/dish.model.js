@@ -32,11 +32,32 @@ const dishSchema = new Schema({
     type: String,
     required: true,
   },
-  diners: {
-    type: Number,
-  },
   createdAt: {
     type: Date,
+  },
+  stats: {
+    type: {
+      used: {
+        type: Number,
+        default: 0,
+      },
+      unused: {
+        type: Number,
+        default: 0,
+      },
+    },
+  },
+  sales: {
+    type: {
+      diners: {
+        type: Number,
+        default: 0,
+      },
+      money: {
+        type: Number,
+        default: 0,
+      },
+    },
   },
 });
 
