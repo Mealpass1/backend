@@ -2,7 +2,8 @@ const Menu = require("../models/menu.model");
 
 exports.getMenu = async (req, res) => {
   await Menu.find({ diner: req.diner._id })
-    .populate("order", "dish")
+    .populate("order")
+    .populate("dish")
     .then((menu) => {
       return res.json({
         status: "success",
@@ -20,7 +21,8 @@ exports.getMenu = async (req, res) => {
 
 exports.getOrder = async (req, res) => {
   await Menu.findById(req.params.id)
-    .populate("order", "dish")
+    .populate("order")
+    .populate("dish")
     .then((order) => {
       return res.json({
         status: "success",
