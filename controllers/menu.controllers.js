@@ -4,6 +4,7 @@ exports.getMenu = async (req, res) => {
   await Menu.find({ diner: req.diner._id })
     .populate("order")
     .populate("dish")
+    .populate("diner")
     .then((menu) => {
       return res.json({
         status: "success",
