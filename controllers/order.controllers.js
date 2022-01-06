@@ -34,7 +34,13 @@ exports.create = async (req, res) => {
           await menu.save().then(async (response) => {
             await Cart.findByIdAndRemove(item.cart, {}).then(
               async (response) => {
-                await 
+                await Dish.findByIdAndUpdate(item.dish, {
+                  stats: {
+                    unused: cart.mealServing,
+                  },
+                  $inc: { sales: { diners: 1 } },
+                  $inc: { sales: { money: cart.subTotal } },
+                });
               }
             );
           });
