@@ -8,7 +8,7 @@ const {
 
 const authMiddleware = require("../middlewares/restaurant.auth");
 
-const upload = require("../services/multer.service");
+const upload = require("../services/image.service");
 
 const router = express.Router();
 
