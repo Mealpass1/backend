@@ -3,6 +3,7 @@ const express = require("express");
 const authMiddleware = require("../middlewares/diner.auth");
 
 const {
+  oneDish,
   addDish,
   getAll,
   deleteDish,
@@ -17,5 +18,6 @@ router.get("/", authMiddleware, getAll);
 router.delete("/delete/:id", authMiddleware, deleteDish);
 router.put("/update/:id", authMiddleware, updateDish);
 router.put("/updatemealserving/:id", authMiddleware, updateMealServing);
+router.get("/:id", oneDish);
 
 module.exports = router;
