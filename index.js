@@ -36,7 +36,7 @@ if (cluster.isPrimary) {
   //some configurations
   app.use(cors());
   app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(bodyParser.urlencoded({ extended: true }));
 
   //base endpoints
   app.use("/diner", dinerRoutes);
