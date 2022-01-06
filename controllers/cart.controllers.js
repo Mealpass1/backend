@@ -28,9 +28,10 @@ exports.addDish = async (req, res) => {
       timeOfMeal: data.timeOfMeal,
       daysInWeek: data.daysInWeek,
       deliveryMode: data.deliveryMode,
-      repeatesInMonth: data.repeatesInMonth,
+      repeatsInMonth: data.repeatesInMonth,
       mealServing:
         data.quantity * data.daysInWeek.length * data.repeatesInMonth,
+      createdAt: Date.now(),
     });
     await cart
       .save()
@@ -62,7 +63,8 @@ exports.addDish = async (req, res) => {
 
 exports.getAll = async (req, res) => {
   await Cart.find({ diner: req.diner._id })
-    .populate("dish", "restaurant")
+    .populate("dish")
+    .populate("restaurant")
     .then((items) => {
       return res.json({
         status: "success",
