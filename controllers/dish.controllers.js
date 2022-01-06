@@ -1,18 +1,14 @@
 const Dish = require("../models/dish.model");
 const Restaurant = require("../models/restaurant.model");
 
-const { uploads } = require("../services/cloudinary.service");
-
 exports.createDish = async (req, res) => {
-  const uploader = async (path) => await uploads(path, "mealpass");
-
   const data = {
     name: req.body.name,
     price: req.body.price,
     description: req.body.description,
     discount: req.body.discount,
     category: req.body.category,
-    // image: req.file.path,
+    image: req.file.path,
   };
 
   if (!req.restaurant.dishTypes.includes(data.category)) {
@@ -21,7 +17,6 @@ exports.createDish = async (req, res) => {
     });
   }
 
-  // await uploader(data.image).then(async (url) => {
   const dish = new Dish({
     restaurant: req.restaurant._id,
     name: data.name,
@@ -29,7 +24,7 @@ exports.createDish = async (req, res) => {
     description: data.description,
     discount: data.discount,
     category: data.category,
-    image: "none",
+    image: data.image,
     createdAt: Date.now(),
   });
 
@@ -58,7 +53,6 @@ exports.createDish = async (req, res) => {
         message: err.message,
       });
     });
-  // });
 };
 
 exports.allDishes = async (req, res) => {
