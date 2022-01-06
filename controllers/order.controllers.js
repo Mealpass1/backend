@@ -1,6 +1,7 @@
 const Order = require("../models/order.model");
 const Menu = require("../models/menu.model");
 const Cart = require("../models/cart.model");
+const Dish = require("../models/dish.model");
 
 exports.create = async (req, res) => {
   const data = {
@@ -31,7 +32,11 @@ exports.create = async (req, res) => {
             createdAt: Date.now(),
           });
           await menu.save().then(async (response) => {
-            await Cart.findByIdAndRemove(item.cart, {});
+            await Cart.findByIdAndRemove(item.cart, {}).then(
+              async (response) => {
+                await 
+              }
+            );
           });
         });
       });
