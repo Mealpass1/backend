@@ -16,6 +16,6 @@ router.post("/signup", signup);
 router.post("/login", login);
 router.put("/logout/:id", authMiddleware, logout);
 router.get("/", allDiners);
-router.get("/:id", authMiddleware, oneDiner);
+router.get("/:id", oneDiner);
 
 module.exports = router;
