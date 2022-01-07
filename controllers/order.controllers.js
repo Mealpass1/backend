@@ -20,7 +20,7 @@ exports.create = async (req, res) => {
           daysInWeek: cart.daysInWeek,
           deliveryMode: cart.deliveryMode,
           repeatsInMonth: cart.repeatsInMonth,
-          mealServing: cart.mealServing,
+          mealServing: { unused: cart.mealServing },
           createdAt: Date.now(),
         });
         await order.save().then(async (response) => {
