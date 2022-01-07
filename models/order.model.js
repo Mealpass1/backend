@@ -39,8 +39,16 @@ const orderSchema = new Schema({
     required: true,
   },
   mealServing: {
-    type: Number,
-    required: true,
+    type: {
+      used: {
+        type: Number,
+        default: 0,
+      },
+      unused: {
+        type: Number,
+        default: 0,
+      },
+    },
   },
   finishedAt: {
     type: Date,
