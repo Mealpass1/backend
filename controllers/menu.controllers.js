@@ -5,6 +5,7 @@ exports.getMenu = async (req, res) => {
     .populate("order")
     .populate("dish")
     .populate("diner")
+    .populate("restaurant")
     .then((menu) => {
       return res.json({
         status: "success",
