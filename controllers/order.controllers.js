@@ -2,6 +2,7 @@ const Order = require("../models/order.model");
 const Menu = require("../models/menu.model");
 const Cart = require("../models/cart.model");
 const Dish = require("../models/dish.model");
+const Restaurant = require("../models/restaurant.model");
 
 exports.create = async (req, res) => {
   const data = {
@@ -36,8 +37,10 @@ exports.create = async (req, res) => {
               $inc: { "stats.unused": parseInt(cart.mealServing) },
               $inc: { "sales.diners": 1 },
               $inc: { "sales.money": parseInt(cart.subTotal) },
-            }).then(async (response) => {
-              await Cart.findByIdAndRemove(item.cart);
+            }).then(async (dish) => {
+              await Restaurant.findByIdAndUpdate(dish.restaurant, {
+                $inc: { revenue: cart.subTotal },
+              }).then(async (response) => {});
             });
           });
         });
