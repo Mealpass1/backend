@@ -38,6 +38,7 @@ const cartSchema = new Schema({
   mealServing: {
     type: Number,
     required: true,
+    default: 0,
   },
   subTotal: {
     type: Number,
