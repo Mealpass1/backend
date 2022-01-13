@@ -26,6 +26,7 @@ if (cluster.isPrimary) {
   const dishRoutes = require("./routes/dish.routes");
   const orderRoutes = require("./routes/order.routes");
   const menuRoutes = require("./routes/menu.routes");
+  const requestRoutes = require("./routes/request.routes");
 
   //initialize app
   const app = express();
@@ -45,6 +46,7 @@ if (cluster.isPrimary) {
   app.use("/dish", dishRoutes);
   app.use("/order", orderRoutes);
   app.use("/menu", menuRoutes);
+  app.use("/request", requestRoutes);
 
   //start the server
   const PORT = process.env.PORT || 8080;
