@@ -9,11 +9,12 @@ exports.create = async (req, res) => {
     dish: req.body.dish,
     order: req.body.order,
     restaurant: req.body.restaurant,
+    menu: req.body.menu,
     status: "pending",
     quantity: 1,
   };
 
-  await Dish.findOneById(data.dish).then(async (dish) => {
+  await Dish.findById(data.dish).then(async (dish) => {
     if (!dish) {
       return res.json({
         status: "error",
@@ -48,6 +49,20 @@ exports.create = async (req, res) => {
                   quantity: data.quantity,
                   createdAt: Date.now(),
                 });
+                request
+                  .save()
+                  .then((response) => {
+                    return res.json({
+                      status: "success",
+                      message: "request made",
+                    });
+                  })
+                  .catch((err) => {
+                    return res.json({
+                      status: "error",
+                      message: err.message,
+                    });
+                  });
               });
             });
           });
