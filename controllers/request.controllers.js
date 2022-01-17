@@ -26,6 +26,15 @@ exports.create = async (req, res) => {
             status: "error",
             message: "order doesn't exist",
           });
+        } else {
+          await Dish.findByIdAndUpdate(data.dish, {
+            $inc: { "stats.used": 1 },
+            $inc: { "stats.unused": -1 },
+          }).then(async (response) => {
+            await Menu.findByIdAndUpdate(data.menu, {
+              used: true,
+            }).then(async(menu));
+          });
         }
       });
     }
