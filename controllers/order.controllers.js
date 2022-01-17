@@ -73,6 +73,9 @@ exports.create = async (req, res) => {
 
 exports.allOrders = async (req, res) => {
   await Order.find({ restaurant: req.restaurant._id })
+    .populate("diner")
+    .populate("restaurant")
+    .populate("dish")
     .then((orders) => {
       return res.json({
         status: "success",
@@ -90,6 +93,9 @@ exports.allOrders = async (req, res) => {
 
 exports.oneOrder = async (req, res) => {
   await Order.findById(req.params.id)
+    .populate("diner")
+    .populate("restaurant")
+    .populate("dish")
     .then((order) => {
       return res.json({
         status: "success",
