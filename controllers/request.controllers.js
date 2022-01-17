@@ -28,12 +28,28 @@ exports.create = async (req, res) => {
           });
         } else {
           await Dish.findByIdAndUpdate(data.dish, {
-            $inc: { "stats.used": 1 },
-            $inc: { "stats.unused": -1 },
+            $inc: { "stats.used": data.quantity },
+            $inc: { "stats.unused": -data.quantity },
           }).then(async (response) => {
             await Menu.findByIdAndUpdate(data.menu, {
               used: true,
-            }).then(async(menu));
+              $push: { usage: { date: Date.now(), quantity: data.quantity } },
+            }).then(async (response) => {
+              Order.findByIdAndUpdate(data.order, {
+                $inc: { "mealServing.used": data.quantity },
+                $inc: { "mealServing.unused": -data.quantity },
+              }).then(async (response) => {
+                const request = new Request({
+                  diner: data.diner,
+                  dish: data.dish,
+                  order: data.order,
+                  restaurant: data.restaurant,
+                  status: data.status,
+                  quantity: data.quantity,
+                  createdAt: Date.now(),
+                });
+              });
+            });
           });
         }
       });
