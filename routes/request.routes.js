@@ -1,11 +1,13 @@
 const express = require("express");
 
-const { create } = require("../controllers/request.controllers");
+const { create, allRequests } = require("../controllers/request.controllers");
 
-const authMiddleware = require("../middlewares/diner.auth");
+const dinerAuth = require("../middlewares/diner.auth");
+const restaurantAuth = require("../middlewares/restaurant.auth");
 
 const router = express.Router();
 
-router.post("/add", authMiddleware, create);
+router.get("/", restaurantAuth, allRequests);
+router.post("/add", dinerAuth, create);
 
 module.exports = router;
