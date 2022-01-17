@@ -25,6 +25,7 @@ exports.getOrder = async (req, res) => {
   await Menu.findById(req.params.id)
     .populate("order")
     .populate("dish")
+    .populate("restaurant")
     .then((order) => {
       return res.json({
         status: "success",
