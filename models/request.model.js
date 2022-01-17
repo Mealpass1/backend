@@ -27,6 +27,7 @@ const requestSchema = new Schema({
   quantity: {
     type: Number,
     required: true,
+    default: 0,
   },
   createdAt: {
     type: Date,
