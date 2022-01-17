@@ -71,3 +71,23 @@ exports.create = async (req, res) => {
     }
   });
 };
+
+exports.allRequests = async (req, res) => {
+  await Request.find({ restaurant: req.restaurant._id })
+    .populate("dish")
+    .populate("order")
+    .populate("diner")
+    .then((requests) => {
+      return res.json({
+        status: "success",
+        message: "All requests",
+        data: requests,
+      });
+    })
+    .catch((err) => {
+      return res.json({
+        status: "error",
+        message: err.message,
+      });
+    });
+};
