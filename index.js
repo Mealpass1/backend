@@ -43,9 +43,6 @@ if (cluster.isPrimary) {
   app.use(express.static(path.join(__dirname, "public")));
 
   //base endpoints
-  app.use("/", (req, res) => {
-    res.render("welcome");
-  });
   app.use("/diner", dinerRoutes);
   app.use("/cart", cartRoutes);
   app.use("/restaurant", restaurantRoutes);
@@ -53,7 +50,9 @@ if (cluster.isPrimary) {
   app.use("/order", orderRoutes);
   app.use("/menu", menuRoutes);
   app.use("/request", requestRoutes);
-
+  app.get("/", (req, res) => {
+    res.render("welcome");
+  });
   //start the server
   const PORT = process.env.PORT || 8080;
   app.listen(PORT, () => {
