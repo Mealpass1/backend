@@ -16,6 +16,7 @@ if (cluster.isPrimary) {
 } else {
   //packages
   const cors = require("cors");
+  const path = require("path");
   const bodyParser = require("body-parser");
   const dotenv = require("dotenv").config();
 
@@ -37,9 +38,14 @@ if (cluster.isPrimary) {
   //some configurations
   app.use(cors());
   app.use(bodyParser.json());
+  app.set("view engine", "pug");
   app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(express.static(path.join(__dirname, "public")));
 
   //base endpoints
+  app.use("/", (req, res) => {
+    res.render("welcome");
+  });
   app.use("/diner", dinerRoutes);
   app.use("/cart", cartRoutes);
   app.use("/restaurant", restaurantRoutes);
