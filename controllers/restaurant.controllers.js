@@ -192,16 +192,17 @@ exports.update = async (req, res) => {
     businessName: req.body.businessName,
     email: req.body.email,
     username: req.body.username,
-    password: req.body.password,
     address: req.body.address,
     phone: req.body.phone,
     description: req.body.description,
+    image: req.files
+      ? file.path
+      : "https://res.cloudinary.com/f-studios/image/upload/v1640983800/mealpass/restaurant_c96woi.png",
   };
   Restaurant.findByIdAndUpdate(req.restaurant._id, {
     businessName: data.businessName,
     email: data.email,
     username: data.username,
-    password: data.password,
     address: data.address,
     phone: data.phone,
     description: data.description,
