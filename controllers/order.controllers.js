@@ -12,51 +12,88 @@ exports.create = async (req, res) => {
 
   try {
     for (let item of data.array) {
-      await Cart.findById(item.cart).then(async (cart) => {
-        const order = new Order({
-          diner: req.diner._id,
-          restaurant: item.restaurant,
-          dish: item.dish,
-          quantity: cart.quantity,
-          timeOfMeal: cart.timeOfMeal,
-          daysInWeek: cart.daysInWeek,
-          deliveryMode: cart.deliveryMode,
-          repeatsInMonth: cart.repeatsInMonth,
-          mealServing: { unused: cart.mealServing },
-          createdAt: Date.now(),
-        });
-        await order.save().then(async (order) => {
-          const menu = new Menu({
-            diner: order.diner,
-            order: order._id,
-            dish: order.dish,
-            restaurant: order.restaurant,
+      await Cart.findById(item.cart)
+        .then(async (cart) => {
+          const order = new Order({
+            diner: req.diner._id,
+            restaurant: item.restaurant,
+            dish: item.dish,
+            quantity: cart.quantity,
+            timeOfMeal: cart.timeOfMeal,
+            daysInWeek: cart.daysInWeek,
+            deliveryMode: cart.deliveryMode,
+            repeatsInMonth: cart.repeatsInMonth,
+            mealServing: { unused: cart.mealServing },
             createdAt: Date.now(),
           });
-          await menu.save().then(async (response) => {
-            await Dish.findByIdAndUpdate(
-              item.dish,
-              {
-                $inc: { "stats.unused": parseInt(cart.mealServing) },
-                $inc: { "sales.diners": 1 },
-                $inc: { "sales.money": parseInt(cart.subTotal) },
-              },
-              { upsert: true }
-            ).then(async (dish) => {
-              await Restaurant.findByIdAndUpdate(dish.restaurant, {
-                $inc: { revenue: cart.subTotal },
-              }).then(async (response) => {
-                await Diner.findByIdAndUpdate(req.diner._id, {
-                  $inc: { purchases: parseInt(cart.subTotal) },
-                  $pull: { cart: { $elemMatch: `${cart._id}` } },
-                }).then(async (response) => {
-                  await Cart.findByIdAndRemove(item.cart);
+          await order
+            .save()
+            .then(async (order) => {
+              const menu = new Menu({
+                diner: order.diner,
+                order: order._id,
+                dish: order.dish,
+                restaurant: order.restaurant,
+                createdAt: Date.now(),
+              });
+              await menu
+                .save()
+                .then(async (response) => {
+                  await Dish.findByIdAndUpdate(
+                    item.dish,
+                    {
+                      $inc: { "stats.unused": parseInt(cart.mealServing) },
+                      $inc: { "sales.diners": 1 },
+                      $inc: { "sales.money": parseInt(cart.subTotal) },
+                    },
+                    { upsert: true }
+                  )
+                    .then(async (dish) => {
+                      await Restaurant.findByIdAndUpdate(dish.restaurant, {
+                        $inc: { revenue: cart.subTotal },
+                      })
+                        .then(async (response) => {
+                          await Diner.findByIdAndUpdate(req.diner._id, {
+                            $inc: { purchases: parseInt(cart.subTotal) },
+                            $pull: { cart: { $elemMatch: `${cart._id}` } },
+                          }).then(async (response) => {
+                            await Cart.findByIdAndRemove(item.cart);
+                          });
+                        })
+                        .catch((error) => {
+                          return res.json({
+                            status: "error",
+                            message: error.message,
+                          });
+                        });
+                    })
+                    .catch((error) => {
+                      return res.json({
+                        status: "error",
+                        message: error.message,
+                      });
+                    });
+                })
+                .catch((error) => {
+                  return res.json({
+                    status: "error",
+                    message: error.message,
+                  });
                 });
+            })
+            .catch((error) => {
+              return res.json({
+                status: "error",
+                message: error.message,
               });
             });
+        })
+        .catch((error) => {
+          return res.json({
+            status: "error",
+            message: error.message,
           });
         });
-      });
     }
 
     return res.json({
