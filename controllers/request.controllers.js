@@ -11,7 +11,7 @@ exports.create = async (req, res) => {
     restaurant: req.body.restaurant,
     menu: req.body.menu,
     status: "pending",
-    quantity: 1,
+    quantity: req.body.quantity,
   };
 
   await Dish.findById(data.dish).then(async (dish) => {
@@ -31,41 +31,55 @@ exports.create = async (req, res) => {
           await Dish.findByIdAndUpdate(data.dish, {
             $inc: { "stats.used": data.quantity },
             $inc: { "stats.unused": -data.quantity },
-          }).then(async (response) => {
-            await Menu.findByIdAndUpdate(data.menu, {
-              used: true,
-              $push: { usage: { date: Date.now(), quantity: data.quantity } },
-            }).then(async (response) => {
-              Order.findByIdAndUpdate(data.order, {
-                $inc: { "mealServing.used": data.quantity },
-                $inc: { "mealServing.unused": -data.quantity },
-              }).then(async (response) => {
-                const request = new Request({
-                  diner: data.diner,
-                  dish: data.dish,
-                  order: data.order,
-                  restaurant: data.restaurant,
-                  status: data.status,
-                  quantity: data.quantity,
-                  createdAt: Date.now(),
-                });
-                request
-                  .save()
-                  .then((response) => {
-                    return res.json({
-                      status: "success",
-                      message: "request made",
+          })
+            .then(async (response) => {
+              await Menu.findByIdAndUpdate(data.menu, {
+                used: true,
+                $push: { usage: { date: Date.now(), quantity: data.quantity } },
+              })
+                .then(async (response) => {
+                  Order.findByIdAndUpdate(data.order, {
+                    $inc: { "mealServing.used": data.quantity },
+                    $inc: { "mealServing.unused": -data.quantity },
+                  }).then(async (response) => {
+                    const request = new Request({
+                      diner: data.diner,
+                      dish: data.dish,
+                      order: data.order,
+                      restaurant: data.restaurant,
+                      status: data.status,
+                      quantity: data.quantity,
+                      createdAt: Date.now(),
                     });
-                  })
-                  .catch((err) => {
-                    return res.json({
-                      status: "error",
-                      message: err.message,
-                    });
+                    request
+                      .save()
+                      .then((response) => {
+                        return res.json({
+                          status: "success",
+                          message: "request made",
+                        });
+                      })
+                      .catch((err) => {
+                        return res.json({
+                          status: "error",
+                          message: err.message,
+                        });
+                      });
                   });
+                })
+                .catch((error) => {
+                  return res.json({
+                    status: "error",
+                    message: error.message,
+                  });
+                });
+            })
+            .catch((error) => {
+              return res.json({
+                status: "error",
+                message: error.message,
               });
             });
-          });
         }
       });
     }
