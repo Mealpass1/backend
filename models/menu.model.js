@@ -3,6 +3,10 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const menuSchema = new Schema({
+  inviter: {
+    type: mongoose.Types.ObjectId,
+    ref: "Diner",
+  },
   diner: {
     type: mongoose.Types.ObjectId,
     ref: "Diner",

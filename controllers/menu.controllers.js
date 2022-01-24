@@ -1,4 +1,5 @@
 const Menu = require("../models/menu.model");
+const Diner = require("../models/diner.model");
 
 exports.getMenu = async (req, res) => {
   await Menu.find({ diner: req.diner._id })
@@ -39,4 +40,34 @@ exports.getOrder = async (req, res) => {
         message: err.message,
       });
     });
+};
+
+exports.shareOrder = async (req, res) => {
+  const data = {
+    person: req.body.person,
+    quantity: req.body.quantity,
+    order: req.body.order,
+    dish: req.body.dish,
+    restaurant: req.body.restaurant,
+  };
+
+  let selected = "";
+
+  const email = await Diner.find({ email: data.person });
+  const username = await Diner.find({ username: data.person });
+
+  if (email.length == 1) {
+    selected = "email";
+  } else if (username.length == 1) {
+    selected = "username";
+  } else {
+    return res.json({
+      status: "error",
+      message: "user not found",
+    });
+  }
+
+  const menu = new Menu({
+    inviter: req.diner._id,
+  });
 };
