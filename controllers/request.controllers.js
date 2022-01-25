@@ -11,7 +11,7 @@ exports.create = async (req, res) => {
     restaurant: req.body.restaurant,
     menu: req.body.menu,
     status: "pending",
-    quantity: req.body.quantity,
+    quantity: 1,
   };
 
   await Dish.findById(data.dish).then(async (dish) => {
@@ -30,7 +30,7 @@ exports.create = async (req, res) => {
         } else {
           await Dish.findByIdAndUpdate(data.dish, {
             $inc: { "stats.used": data.quantity },
-            $inc: { "stats.unused": -data.quantity },
+            $inc: { "stats.unused": parseInt(-data.quantity) },
           })
             .then(async (response) => {
               await Menu.findByIdAndUpdate(data.menu, {
