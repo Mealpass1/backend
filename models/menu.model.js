@@ -54,6 +54,7 @@ const menuSchema = new Schema({
         },
         to: {
           type: mongoose.Types.ObjectId,
+          ref: "Diner",
         },
         quantity: {
           type: Number,
