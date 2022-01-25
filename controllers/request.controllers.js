@@ -46,7 +46,7 @@ exports.create = async (req, res) => {
                 .then(async (response) => {
                   Order.findByIdAndUpdate(data.order, {
                     $inc: { "mealServing.used": data.quantity },
-                    $inc: { "mealServing.unused": -data.quantity },
+                    $inc: { "mealServing.unused": parseInt(-data.quantity) },
                   }).then(async (response) => {
                     const request = new Request({
                       diner: data.diner,
