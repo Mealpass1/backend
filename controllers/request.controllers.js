@@ -34,7 +34,6 @@ exports.create = async (req, res) => {
           })
             .then(async (response) => {
               await Menu.findByIdAndUpdate(data.menu, {
-                used: true,
                 $push: {
                   usage: {
                     date: Date.now(),
