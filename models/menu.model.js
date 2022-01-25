@@ -43,6 +43,10 @@ const menuSchema = new Schema({
         quantity: {
           type: Number,
         },
+        status: {
+          type: String,
+          enum: ["pending", "complete"],
+        },
       },
     ],
   },
@@ -53,7 +57,7 @@ const menuSchema = new Schema({
           type: Date,
         },
         to: {
-          type: String,
+          type: mongoose.Types.ObjectId,
         },
         quantity: {
           type: Number,
