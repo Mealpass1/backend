@@ -26,10 +26,6 @@ const menuSchema = new Schema({
   createdAt: {
     type: Date,
   },
-  used: {
-    type: Boolean,
-    default: false,
-  },
   shared: {
     type: Boolean,
     default: false,
