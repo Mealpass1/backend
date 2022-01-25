@@ -1,5 +1,6 @@
 const Menu = require("../models/menu.model");
 const Diner = require("../models/diner.model");
+const Order = require("../models/order.model");
 
 exports.getMenu = async (req, res) => {
   await Menu.find({ diner: req.diner._id })
@@ -53,12 +54,12 @@ exports.shareOrder = async (req, res) => {
 
   let selected = "";
 
-  const email = await Diner.find({ email: data.person });
-  const username = await Diner.find({ username: data.person });
+  const email = await Diner.findOne({ email: data.person });
+  const username = await Diner.findOne({ username: data.person });
 
-  if (email.length == 1) {
+  if (email) {
     selected = "email";
-  } else if (username.length == 1) {
+  } else if (username) {
     selected = "username";
   } else {
     return res.json({
@@ -67,7 +68,79 @@ exports.shareOrder = async (req, res) => {
     });
   }
 
-  const menu = new Menu({
-    inviter: req.diner._id,
-  });
+  await Order.findOne({ _id: data.order })
+    .then(async (response) => {
+      if (response.mealServing.unused > data.quantity) {
+        const menu = new Menu({
+          inviter: req.diner._id,
+          diner: email?._id || username?._id,
+          order: data.order,
+          dish: data.dish,
+          restaurant: data.restaurant,
+          createdAt: Date.now(),
+        });
+
+        await menu
+          .save()
+          .then((response) => {
+            Order.findOneAndUpdate(
+              { _id: data.order },
+              {
+                $inc: { "mealServing.used": data.quantity },
+                $inc: { "mealServing.unused": -data.quantity },
+              }
+            )
+              .then((response) => {
+                Menu.findOneAndUpdate(
+                  { diner: req.diner._id },
+                  {
+                    shared: true,
+                    $push: {
+                      sharing: {
+                        date: Date.now(),
+                        to: email?._id || username?._id,
+                        quantity: data.quantity,
+                      },
+                    },
+                  }
+                )
+                  .then((response) => {
+                    return res.json({
+                      status: "success",
+                      message: "Meal shared",
+                    });
+                  })
+                  .catch((error) => {
+                    return res.json({
+                      status: "error",
+                      message: error.message,
+                    });
+                  });
+              })
+              .catch((err) => {
+                return res.json({
+                  status: "error",
+                  message: error.message,
+                });
+              });
+          })
+          .catch((error) => {
+            return res.json({
+              status: "error",
+              message: error.message,
+            });
+          });
+      } else {
+        return res.json({
+          status: "error",
+          message: "Invalid mealServing quantity",
+        });
+      }
+    })
+    .catch((err) => {
+      return res.json({
+        status: "error",
+        message: "order not found",
+      });
+    });
 };
