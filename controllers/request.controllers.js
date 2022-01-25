@@ -35,7 +35,13 @@ exports.create = async (req, res) => {
             .then(async (response) => {
               await Menu.findByIdAndUpdate(data.menu, {
                 used: true,
-                $push: { usage: { date: Date.now(), quantity: data.quantity } },
+                $push: {
+                  usage: {
+                    date: Date.now(),
+                    quantity: data.quantity,
+                    status: "pending",
+                  },
+                },
               })
                 .then(async (response) => {
                   Order.findByIdAndUpdate(data.order, {
