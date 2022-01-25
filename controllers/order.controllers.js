@@ -55,7 +55,7 @@ exports.create = async (req, res) => {
                         .then(async (response) => {
                           await Diner.findByIdAndUpdate(req.diner._id, {
                             $inc: { purchases: parseInt(cart.subTotal) },
-                            $pull: { cart: { $elemMatch: `${cart._id}` } },
+                            $pull: { cart: `${cart._id}` },
                           }).then(async (response) => {
                             await Cart.findByIdAndRemove(item.cart);
                           });
