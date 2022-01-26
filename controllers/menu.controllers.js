@@ -86,7 +86,7 @@ exports.shareOrder = async (req, res) => {
             Order.findOneAndUpdate(
               { _id: data.order },
               {
-                $inc: { "mealServing.used": data.quantity },
+                $inc: { "mealServing.used": +data.quantity },
                 $inc: { "mealServing.unused": -data.quantity },
               }
             )
@@ -98,7 +98,7 @@ exports.shareOrder = async (req, res) => {
                     $push: {
                       sharing: {
                         date: Date.now(),
-                        to: email?._id || username?._id,
+                        to: email?.username || username?.username,
                         quantity: data.quantity,
                       },
                     },
