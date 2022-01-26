@@ -53,8 +53,7 @@ const menuSchema = new Schema({
           type: Date,
         },
         to: {
-          type: mongoose.Types.ObjectId,
-          ref: "Diner",
+          type: String,
         },
         quantity: {
           type: Number,
