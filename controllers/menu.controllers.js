@@ -72,7 +72,10 @@ exports.shareOrder = async (req, res) => {
     .then(async (response) => {
       if (response.mealServing.unused > data.quantity) {
         const menu = new Menu({
-          inviter: req.diner._id,
+          invite: {
+            from: req.diner.username,
+            quantity: data.quantity,
+          },
           diner: email?._id || username?._id,
           order: data.order,
           dish: data.dish,
