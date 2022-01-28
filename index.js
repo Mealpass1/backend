@@ -19,6 +19,7 @@ if (cluster.isPrimary) {
   const path = require("path");
   const bodyParser = require("body-parser");
   const dotenv = require("dotenv").config();
+  const webPush = require("web-push");
 
   //files
   const dinerRoutes = require("./routes/diner.routes");
@@ -41,6 +42,11 @@ if (cluster.isPrimary) {
   app.set("view engine", "pug");
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(express.static(path.join(__dirname, "public")));
+  webPush.setVapidDetails(
+    "mailto: byiringirosaad@gmail.com",
+    `${process.env.NOTIF_PUB_KEY}`,
+    `${process.env.NOTIF_PRI_KEY}`
+  );
 
   //base endpoints
   app.use("/diner", dinerRoutes);
@@ -53,6 +59,17 @@ if (cluster.isPrimary) {
   app.get("/", (req, res) => {
     res.render("welcome");
   });
+  app.use("/message", (req, res) => {
+    console.log("done");
+    const subscription = req.body;
+    res.status(201).json({});
+    const payload = JSON.stringify({ title: "Push test" });
+
+    webPush
+      .sendNotification(subscription, payload)
+      .catch((err) => console.log(err));
+  });
+
   //start the server
   const PORT = process.env.PORT || 8080;
   app.listen(PORT, () => {
