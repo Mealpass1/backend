@@ -106,19 +106,6 @@ if (cluster.isPrimary) {
       }
     });
     res.status(200).json({ success: true });
-
-    // const payload = JSON.stringify({
-    //   title: req.body.title,
-    //   description: "Test",
-    //   icon: "https://res.cloudinary.com/f-studios/image/upload/v1643705471/android-144x144_pq3teb.png",
-    // });
-    // // console.log(req.body.subscription);
-    // webPush
-    //   .sendNotification(req.body.subscription, payload)
-    //   .then((result) => console.log())
-    //   .catch((e) => console.log(e.stack));
-
-    // res.status(200).json({ success: true });
   });
 
   //start the server
