@@ -66,45 +66,12 @@ if (cluster.isPrimary) {
 
   app.post("/notifications/subscribe", async (req, res) => {
     const { id } = jwt_decode(req.body.token);
-    await Diner.find({ _id: id }).then(async (response) => {
-      if (!response.pushSubscription) {
-        await Diner.findOneAndUpdate(
-          { _id: id },
-          {
-            pushSubscription: req.body.subscription,
-          }
-        )
-          .then((response) => {
-            webPush
-              .sendNotification(
-                req.body.subscription,
-                JSON.stringify({
-                  title: "MealPass",
-                  description:
-                    "You subscribed to MealPass notifications system",
-                  icon: "https://res.cloudinary.com/f-studios/image/upload/v1643705471/android-144x144_pq3teb.png",
-                })
-              )
-              .then((result) => console.log())
-              .catch((e) => console.log(e.stack));
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      } else {
-        webPush
-          .sendNotification(
-            req.body.subscription,
-            JSON.stringify({
-              title: "MealPass",
-              description: "Welcome back to MealPass",
-              icon: "https://res.cloudinary.com/f-studios/image/upload/v1643705471/android-144x144_pq3teb.png",
-            })
-          )
-          .then((result) => console.log())
-          .catch((e) => console.log(e.stack));
+    await Diner.findOneAndUpdate(
+      { _id: id },
+      {
+        pushSubscription: req.body.subscription,
       }
-    });
+    );
     res.status(200).json({ success: true });
   });
 
