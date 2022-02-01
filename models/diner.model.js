@@ -37,6 +37,9 @@ const dinerSchema = new Schema({
   lastLogin: {
     type: Date,
   },
+  pushSubscription: {
+    type: {},
+  },
 });
 
 module.exports = mongoose.model("Diner", dinerSchema);
