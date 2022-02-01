@@ -64,18 +64,61 @@ if (cluster.isPrimary) {
     res.render("welcome");
   });
 
-  app.use("/notifications/subscribe", async (req, res) => {
+  app.post("/notifications/subscribe", async (req, res) => {
     const { id } = jwt_decode(req.body.token);
+    await Diner.find({ _id: id }).then(async (response) => {
+      if (!response.pushSubscription) {
+        await Diner.findOneAndUpdate(
+          { _id: id },
+          {
+            pushSubscription: req.body.subscription,
+          }
+        )
+          .then((response) => {
+            webPush
+              .sendNotification(
+                req.body.subscription,
+                JSON.stringify({
+                  title: "MealPass",
+                  description:
+                    "You subscribed to MealPass notifications system",
+                  icon: "https://res.cloudinary.com/f-studios/image/upload/v1643705471/android-144x144_pq3teb.png",
+                })
+              )
+              .then((result) => console.log())
+              .catch((e) => console.log(e.stack));
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      } else {
+        webPush
+          .sendNotification(
+            req.body.subscription,
+            JSON.stringify({
+              title: "MealPass",
+              description: "Welcome back to MealPass",
+              icon: "https://res.cloudinary.com/f-studios/image/upload/v1643705471/android-144x144_pq3teb.png",
+            })
+          )
+          .then((result) => console.log())
+          .catch((e) => console.log(e.stack));
+      }
+    });
+    res.status(200).json({ success: true });
 
-    await Diner.findByIdAndUpdate(id, {
-      pushSubscription: req.body.subscription,
-    })
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    // const payload = JSON.stringify({
+    //   title: req.body.title,
+    //   description: "Test",
+    //   icon: "https://res.cloudinary.com/f-studios/image/upload/v1643705471/android-144x144_pq3teb.png",
+    // });
+    // // console.log(req.body.subscription);
+    // webPush
+    //   .sendNotification(req.body.subscription, payload)
+    //   .then((result) => console.log())
+    //   .catch((e) => console.log(e.stack));
+
+    // res.status(200).json({ success: true });
   });
 
   //start the server
