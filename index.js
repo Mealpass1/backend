@@ -29,6 +29,8 @@ if (cluster.isPrimary) {
   const orderRoutes = require("./routes/order.routes");
   const menuRoutes = require("./routes/menu.routes");
   const requestRoutes = require("./routes/request.routes");
+  const Diner = require("./models/diner.model");
+  const jwt_decode = require("jwt-decode");
 
   //initialize app
   const app = express();
@@ -62,19 +64,12 @@ if (cluster.isPrimary) {
     res.render("welcome");
   });
 
-  app.use("/notifications/subscribe", (req, res) => {
-    console.log("done");
-    const payload = JSON.stringify({
-      title: req.body.title,
-      description: req.body.description,
-    });
+  app.use("/notifications/subscribe", async (req, res) => {
+    const { id } = jwt_decode(req.body.token);
 
-    webPush
-      .sendNotification(req.body.subscription, payload)
-      .then((result) => {
-        return res.json({ status: "success", message: result });
-      })
-      .catch((e) => console.log(e.stack));
+    await Diner.findByIdAndUpdate(id, {
+      pushSubscription: req.body.subscription,
+    });
   });
 
   //start the server
