@@ -43,7 +43,7 @@ if (cluster.isPrimary) {
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(express.static(path.join(__dirname, "public")));
   webPush.setVapidDetails(
-    "mailto: `sajuengine@gmail.com`",
+    "mailto: sajuengine@gmail.com",
     `${process.env.NOTIF_PUB_KEY}`,
     `${process.env.NOTIF_PRI_KEY}`
   );
@@ -56,15 +56,17 @@ if (cluster.isPrimary) {
   app.use("/order", orderRoutes);
   app.use("/menu", menuRoutes);
   app.use("/request", requestRoutes);
+
+  //reserved endpoints
   app.get("/", (req, res) => {
     res.render("welcome");
   });
-  app.post("/notifications/subscribe", (req, res) => {
+
+  app.use("/notifications/subscribe", (req, res) => {
     console.log("done");
     const payload = JSON.stringify({
       title: req.body.title,
       description: req.body.description,
-      icon: req.body.icon,
     });
 
     webPush
