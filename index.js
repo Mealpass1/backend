@@ -69,7 +69,13 @@ if (cluster.isPrimary) {
 
     await Diner.findByIdAndUpdate(id, {
       pushSubscription: req.body.subscription,
-    });
+    })
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   });
 
   //start the server
