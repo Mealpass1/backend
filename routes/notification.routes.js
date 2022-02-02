@@ -7,4 +7,4 @@ const router = express.Router();
 
 router.post("/subscribe", dinerAuth, subscribe);
 
-export default router;
+module.exports = router;
