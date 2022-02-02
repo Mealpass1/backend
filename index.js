@@ -27,8 +27,7 @@ if (cluster.isPrimary) {
   const orderRoutes = require("./routes/order.routes");
   const menuRoutes = require("./routes/menu.routes");
   const requestRoutes = require("./routes/request.routes");
-  const Diner = require("./models/diner.model");
-  const jwt_decode = require("jwt-decode");
+  const notificationRoutes = require("./routes/notification.routes");
 
   //initialize app
   const app = express();
@@ -56,21 +55,11 @@ if (cluster.isPrimary) {
   app.use("/order", orderRoutes);
   app.use("/menu", menuRoutes);
   app.use("/request", requestRoutes);
+  app.use("/notification", notificationRoutes);
 
   //reserved endpoints
   app.get("/", (req, res) => {
     res.render("welcome");
-  });
-
-  app.post("/notifications/subscribe", async (req, res) => {
-    const { id } = jwt_decode(req.body.token);
-    await Diner.findOneAndUpdate(
-      { _id: id },
-      {
-        pushSubscription: req.body.subscription,
-      }
-    );
-    res.status(200).json({ success: true });
   });
 
   //start the server
