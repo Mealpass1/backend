@@ -1,9 +1,14 @@
+//libraries
+const webPush = require("web-push");
+
+//files
 const Order = require("../models/order.model");
 const Menu = require("../models/menu.model");
 const Cart = require("../models/cart.model");
 const Dish = require("../models/dish.model");
 const Restaurant = require("../models/restaurant.model");
 const Diner = require("../models/diner.model");
+const Notification = require("../models/notifications.model");
 
 exports.create = async (req, res) => {
   const data = {
@@ -34,6 +39,7 @@ exports.create = async (req, res) => {
                 order: order._id,
                 dish: order.dish,
                 restaurant: order.restaurant,
+                status: "approved",
                 createdAt: Date.now(),
               });
               await menu
@@ -57,7 +63,46 @@ exports.create = async (req, res) => {
                             $inc: { purchases: parseInt(cart.subTotal) },
                             $pull: { cart: `${cart._id}` },
                           }).then(async (response) => {
-                            await Cart.findByIdAndRemove(item.cart);
+                            await Cart.findByIdAndRemove(item.cart)
+                              .then((response) => {
+                                const notification = new Notification({
+                                  diner: req.diner._id,
+                                  title: "Your meal order is paid",
+                                  body: "Check your 'Menu tab'",
+                                  createdAt: Date.now(),
+                                });
+
+                                notification
+                                  .save()
+                                  .then((response) => {
+                                    const body = JSON.stringify({
+                                      title: "Meal order",
+                                      description: "Your meal order is paid",
+                                      icon: "https://res.cloudinary.com/f-studios/image/upload/v1643705471/android-144x144_pq3teb.png",
+                                    });
+
+                                    req.diner.pushSubscription.forEach(
+                                      (subscription) => {
+                                        webPush.sendNotification(
+                                          subscription,
+                                          body
+                                        );
+                                      }
+                                    );
+                                  })
+                                  .catch((err) => {
+                                    return res.json({
+                                      status: "error",
+                                      message: error.message,
+                                    });
+                                  });
+                              })
+                              .catch((err) => {
+                                return res.json({
+                                  status: "error",
+                                  message: error.message,
+                                });
+                              });
                           });
                         })
                         .catch((error) => {
@@ -95,7 +140,6 @@ exports.create = async (req, res) => {
           });
         });
     }
-
     return res.json({
       status: "success",
       message: "order was made",
