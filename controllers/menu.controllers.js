@@ -3,7 +3,7 @@ const Diner = require("../models/diner.model");
 const Order = require("../models/order.model");
 
 exports.getMenu = async (req, res) => {
-  await Menu.find({ diner: req.diner._id })
+  await Menu.find({ diner: req.diner._id, status: "approved" })
     .populate("order")
     .populate("dish")
     .populate("diner")
@@ -80,6 +80,7 @@ exports.shareOrder = async (req, res) => {
           order: data.order,
           dish: data.dish,
           restaurant: data.restaurant,
+          status: "pending",
           createdAt: Date.now(),
         });
 
