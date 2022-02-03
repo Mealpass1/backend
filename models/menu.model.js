@@ -68,6 +68,10 @@ const menuSchema = new Schema({
       },
     ],
   },
+  status: {
+    type: String,
+    enum: ["pending", "approved"],
+  },
 });
 
 module.exports = mongoose.model("Menu", menuSchema);
