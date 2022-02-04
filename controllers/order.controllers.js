@@ -81,26 +81,22 @@ exports.create = async (req, res) => {
                                       icon: "https://res.cloudinary.com/f-studios/image/upload/v1643705471/android-144x144_pq3teb.png",
                                     });
 
-                                    req.diner.pushSubscription.forEach(
-                                      (subscription) => {
-                                        webPush.sendNotification(
-                                          subscription,
-                                          body
-                                        );
-                                      }
+                                    return webPush.sendNotification(
+                                      req.diner.pushSubscription,
+                                      body
                                     );
                                   })
                                   .catch((err) => {
                                     return res.json({
                                       status: "error",
-                                      message: error.message,
+                                      message: err.message,
                                     });
                                   });
                               })
                               .catch((err) => {
                                 return res.json({
                                   status: "error",
-                                  message: error.message,
+                                  message: err.message,
                                 });
                               });
                           });
