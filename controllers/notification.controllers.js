@@ -14,7 +14,7 @@ exports.subscribe = async (req, res) => {
     .then((response) => {
       return res.json({
         status: "success",
-        message: "phone registered for notifications",
+        message: "subscription added",
       });
     })
     .catch((err) => {
