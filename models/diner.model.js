@@ -38,12 +38,7 @@ const dinerSchema = new Schema({
     type: Date,
   },
   pushSubscription: {
-    type: [
-      {
-        type: {},
-      },
-    ],
-    default: [],
+    type: {},
   },
 });
 
