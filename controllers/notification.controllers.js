@@ -1,13 +1,39 @@
 const Diner = require("../models/diner.model");
+const Restaurant = require("../models/restaurant.model");
 const Notification = require("../models/notifications.model");
 
-exports.subscribe = async (req, res) => {
+exports.dinerSubscribe = async (req, res) => {
   const data = {
     subscription: req.body.subscription,
   };
 
   await Diner.findOneAndUpdate(
     { _id: req.diner._id },
+    {
+      pushSubscription: data.subscription,
+    }
+  )
+    .then((response) => {
+      return res.json({
+        status: "success",
+        message: "subscription added",
+      });
+    })
+    .catch((err) => {
+      return res.json({
+        status: "error",
+        message: err.message,
+      });
+    });
+};
+
+exports.restaurantSubscribe = async (req, res) => {
+  const data = {
+    subscription: req.body.subscription,
+  };
+
+  await Restaurant.findOneAndUpdate(
+    { _id: req.restaurant._id },
     {
       pushSubscription: data.subscription,
     }
