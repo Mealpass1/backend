@@ -106,8 +106,15 @@ exports.shareOrder = async (req, res) => {
             notification
               .save()
               .then((response) => {
-                const body = JSON.stringify({});
-                webPush.sendNotification();
+                const body = JSON.stringify({
+                  title: "Meal Share",
+                  description: `${req.diner.username} invites you to share meal`,
+                  icon: `${process.env.ICON}`,
+                });
+                webPush.sendNotification(
+                  email?.pushSubscription || username?.pushSubscription,
+                  body
+                );
                 Order.findOneAndUpdate(
                   { _id: data.order },
                   {
