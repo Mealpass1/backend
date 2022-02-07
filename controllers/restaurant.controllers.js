@@ -3,7 +3,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const Restaurant = require("../models/restaurant.model");
-const Dish = require("../models/dish.model");
 
 exports.signup = async (req, res) => {
   const data = {
