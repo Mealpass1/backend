@@ -87,10 +87,20 @@ exports.create = async (req, res) => {
                                         req.diner.pushSubscription,
                                         body
                                       )
-                                      .then((response) => {
-                                        return res.json({
-                                          status: "success",
-                                          message: "order made",
+                                      .then(async (response) => {
+                                        await Restaurant.findById(
+                                          item.restaurant
+                                        ).then((restaurant) => {
+                                          const body = JSON.stringify({
+                                            title: "new meal order",
+                                            description: `${req.diner.username} placed new order`,
+                                            icon: `${process.env.ICON}`,
+                                          });
+
+                                          webPush.sendNotification(
+                                            restaurant.pushSubscription,
+                                            body
+                                          );
                                         });
                                       });
                                   })
