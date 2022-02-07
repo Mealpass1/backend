@@ -1,7 +1,13 @@
+//libraries
+const webPush = require("web-push");
+const dotenv = require("dotenv").config();
+
+//files
 const Dish = require("../models/dish.model");
 const Menu = require("../models/menu.model");
 const Order = require("../models/order.model");
 const Request = require("../models/request.model");
+const Notification = require("../models/notifications.model");
 
 exports.create = async (req, res) => {
   const data = {
@@ -59,10 +65,27 @@ exports.create = async (req, res) => {
                     request
                       .save()
                       .then((response) => {
-                        return res.json({
-                          status: "success",
-                          message: "request made",
+                        const notification = new Notification({
+                          restaurant: data.restaurant,
+                          title: "Meal request",
+                          body: `${req.diner.username} made a meal request`,
+                          createdAt: Date.now(),
                         });
+
+                        notification
+                          .save()
+                          .then((response) => {
+                            return res.json({
+                              status: "success",
+                              message: "request made",
+                            });
+                          })
+                          .catch((err) => {
+                            return res.json({
+                              status: "error",
+                              message: err.message,
+                            });
+                          });
                       })
                       .catch((err) => {
                         return res.json({
