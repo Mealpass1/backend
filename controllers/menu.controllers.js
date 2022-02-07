@@ -1,6 +1,12 @@
+//libraries
+const webPush = require("web-push");
+const dotenv = require("dotenv").config();
+
+//models
 const Menu = require("../models/menu.model");
 const Diner = require("../models/diner.model");
 const Order = require("../models/order.model");
+const Notification = require("../models/notifications.model");
 
 exports.getMenu = async (req, res) => {
   await Menu.find({ diner: req.diner._id, status: "approved" })
@@ -69,8 +75,8 @@ exports.shareOrder = async (req, res) => {
   }
 
   await Order.findOne({ _id: data.order })
-    .then(async (response) => {
-      if (response.mealServing.unused > data.quantity) {
+    .then(async (order) => {
+      if (order.mealServing.unused > data.quantity) {
         const menu = new Menu({
           invite: {
             from: req.diner.username,
@@ -86,42 +92,64 @@ exports.shareOrder = async (req, res) => {
 
         await menu
           .save()
-          .then((response) => {
-            Order.findOneAndUpdate(
-              { _id: data.order },
-              {
-                $inc: { "mealServing.used": +data.quantity },
-                $inc: { "mealServing.unused": -data.quantity },
-              }
-            )
+          .then((menu) => {
+            const notification = new Notification({
+              diner: email?._id || username?._id,
+              title: "Meal share",
+              body: `@${req.diner.username} invited you to share meal`,
+              menu: `${menu._id}`,
+              order: `${order._id}`,
+              dish: `${data.dish}`,
+              createdAt: Date.now(),
+            });
+
+            notification
+              .save()
               .then((response) => {
-                Menu.findOneAndUpdate(
-                  { diner: req.diner._id },
+                const body = JSON.stringify({});
+                webPush.sendNotification();
+                Order.findOneAndUpdate(
+                  { _id: data.order },
                   {
-                    shared: true,
-                    $push: {
-                      sharing: {
-                        date: Date.now(),
-                        to: email?.username || username?.username,
-                        quantity: data.quantity,
-                      },
-                    },
+                    $inc: { "mealServing.used": +data.quantity },
+                    $inc: { "mealServing.unused": -data.quantity },
                   }
                 )
                   .then((response) => {
-                    return res.json({
-                      status: "success",
-                      message: "Meal shared",
-                    });
+                    Menu.findOneAndUpdate(
+                      { diner: req.diner._id },
+                      {
+                        shared: true,
+                        $push: {
+                          sharing: {
+                            date: Date.now(),
+                            to: email?.username || username?.username,
+                            quantity: data.quantity,
+                          },
+                        },
+                      }
+                    )
+                      .then((response) => {
+                        return res.json({
+                          status: "success",
+                          message: "Meal shared",
+                        });
+                      })
+                      .catch((error) => {
+                        return res.json({
+                          status: "error",
+                          message: error.message,
+                        });
+                      });
                   })
-                  .catch((error) => {
+                  .catch((err) => {
                     return res.json({
                       status: "error",
                       message: error.message,
                     });
                   });
               })
-              .catch((err) => {
+              .catch((error) => {
                 return res.json({
                   status: "error",
                   message: error.message,
