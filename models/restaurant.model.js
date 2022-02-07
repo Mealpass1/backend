@@ -66,6 +66,9 @@ const restaurantSchema = new Schema({
   dishTypes: {
     type: [String],
   },
+  pushSubscription: {
+    type: {},
+  },
 });
 
 module.exports = mongoose.model("Restaurant", restaurantSchema);
