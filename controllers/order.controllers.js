@@ -82,10 +82,15 @@ exports.create = async (req, res) => {
                                       icon: `${process.env.ICON}`,
                                     });
 
-                                    return webPush.sendNotification(
+                                    webPush.sendNotification(
                                       req.diner.pushSubscription,
                                       body
                                     );
+
+                                    return res.json({
+                                      status: "success",
+                                      message: "order is paid",
+                                    });
                                   })
                                   .catch((err) => {
                                     return res.json({
