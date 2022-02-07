@@ -42,3 +42,27 @@ exports.notifications = async (req, res) => {
       });
     });
 };
+
+exports.see = async (req, res) => {
+  const data = {
+    notification: req.body.notification,
+  };
+  await Notification.findOneAndUpdate(
+    { diner: req.diner._id, _id: data.notification },
+    {
+      seen: true,
+    }
+  )
+    .then((response) => {
+      return res.json({
+        status: "success",
+        message: "seen",
+      });
+    })
+    .catch((error) => {
+      return res.json({
+        status: "error",
+        message: error.message,
+      });
+    });
+};
