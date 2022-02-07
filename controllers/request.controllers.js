@@ -7,6 +7,7 @@ const Dish = require("../models/dish.model");
 const Menu = require("../models/menu.model");
 const Order = require("../models/order.model");
 const Request = require("../models/request.model");
+const Restaurant = require("../models/restaurant.model");
 const Notification = require("../models/notifications.model");
 
 exports.create = async (req, res) => {
@@ -74,11 +75,26 @@ exports.create = async (req, res) => {
 
                         notification
                           .save()
-                          .then((response) => {
-                            return res.json({
-                              status: "success",
-                              message: "request made",
-                            });
+                          .then(async (response) => {
+                            await Restaurant.findById(data.restaurant).then(
+                              (restaurant) => {
+                                const body = JSON.stringify({
+                                  title: "New meal request",
+                                  description: `${req.diner.username} made a meal request`,
+                                  icon: `${process.env.ICON}`,
+                                });
+
+                                webPush.sendNotification(
+                                  restaurant.pushSubscription,
+                                  body
+                                );
+
+                                return res.json({
+                                  status: "success",
+                                  message: "request made",
+                                });
+                              }
+                            );
                           })
                           .catch((err) => {
                             return res.json({
