@@ -1,5 +1,6 @@
 //libraries
 const webPush = require("web-push");
+const dotenv = require("dotenv").config();
 
 //files
 const Order = require("../models/order.model");
@@ -67,7 +68,7 @@ exports.create = async (req, res) => {
                               .then((response) => {
                                 const notification = new Notification({
                                   diner: req.diner._id,
-                                  title: "Your meal order is paid",
+                                  title: "Meal order",
                                   body: "Check your 'Menu tab'",
                                   createdAt: Date.now(),
                                 });
@@ -78,7 +79,7 @@ exports.create = async (req, res) => {
                                     const body = JSON.stringify({
                                       title: "Meal order",
                                       description: "Your meal order is paid",
-                                      icon: "https://res.cloudinary.com/f-studios/image/upload/v1643705471/android-144x144_pq3teb.png",
+                                      icon: `${process.env.ICON}`,
                                     });
 
                                     return webPush.sendNotification(
