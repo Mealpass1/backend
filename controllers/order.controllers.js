@@ -97,10 +97,16 @@ exports.create = async (req, res) => {
                                             icon: `${process.env.ICON}`,
                                           });
 
-                                          webPush.sendNotification(
-                                            restaurant.pushSubscription,
-                                            body
-                                          );
+                                          webPush
+                                            .sendNotification(
+                                              restaurant.pushSubscription,
+                                              body
+                                            )
+                                            .catch((err) => {
+                                              console.log(
+                                                "restaurant doesn't have notification subscription"
+                                              );
+                                            });
                                         });
                                       });
                                   })
