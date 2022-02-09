@@ -49,9 +49,9 @@ exports.create = async (req, res) => {
                   await Dish.findByIdAndUpdate(
                     item.dish,
                     {
-                      $inc: { "stats.unused": parseInt(cart.mealServing) },
-                      $inc: { "sales.diners": 1 },
-                      $inc: { "sales.money": parseInt(cart.subTotal) },
+                      $inc: { "stats.unused": +cart.mealServing },
+                      $inc: { "sales.diners": +1 },
+                      $inc: { "sales.money": +cart.subTotal },
                     },
                     { upsert: true }
                   )
@@ -61,7 +61,7 @@ exports.create = async (req, res) => {
                       })
                         .then(async (response) => {
                           await Diner.findByIdAndUpdate(req.diner._id, {
-                            $inc: { purchases: parseInt(cart.subTotal) },
+                            $inc: { purchases: +cart.subTotal },
                             $pull: { cart: `${cart._id}` },
                           }).then(async (response) => {
                             await Cart.findByIdAndRemove(item.cart)
