@@ -23,7 +23,8 @@ exports.create = async (req, res) => {
 
     try {
       await Cart.find({ _id: item.cart })
-        .then(async (cart) => {
+        .then(async (response) => {
+          const cart = response[0];
           if (cart) {
             const order = new Order({
               diner: req.diner._id,
@@ -63,7 +64,7 @@ exports.create = async (req, res) => {
                         $inc: { "sales.money": +cart.subTotal },
                       }
                     )
-                      .then(async (response) => {
+                      .then(async (dish) => {
                         await Restaurant.findOneAndUpdate(
                           { _id: item.restaurant },
                           {
@@ -79,47 +80,92 @@ exports.create = async (req, res) => {
                               }
                             )
                               .then(async (response) => {
-                                await Restaurant.findById(item.restaurant)
-                                  .then((restaurant) => {
-                                    const dinerBody = JSON.stringify({
-                                      title: "Order paid",
-                                      description: `Your Order was sent to ${restaurant.businessName} restaurant`,
-                                      icon: `${process.env.ICON}`,
-                                    });
+                                await Cart.findByIdAndRemove(item.cart)
+                                  .then(async (response) => {
+                                    await Restaurant.findById(item.restaurant)
+                                      .then(async (restaurant) => {
+                                        const restaurantBody = JSON.stringify({
+                                          title: "New Order",
+                                          description: `${req.diner.username} placed a new order`,
+                                          icon: `${process.env.ICON}`,
+                                        });
 
-                                    const restaurantBody = JSON.stringify({
-                                      title: "New Order",
-                                      description: `${req.diner.username} placed a new order`,
-                                      icon: `${process.env.ICON}`,
-                                    });
+                                        webPush
+                                          .sendNotification(
+                                            restaurant.pushSubscription,
+                                            restaurantBody
+                                          )
+                                          .then(async (response) => {
+                                            const restaurantNotification =
+                                              new Notification({
+                                                restaurant: item.restaurant,
+                                                title: "New Order Placed",
+                                                body: `${req.diner.username} placed a new order`,
+                                                dish: item.dish,
+                                                order: order._id,
+                                              });
 
-                                    webPush
-                                      .sendNotification(
-                                        restaurant.pushSubscription,
-                                        restaurantBody
-                                      )
-                                      .catch((err) => {
-                                        throw new Error(
-                                          "restaurant notification not sent"
-                                        );
+                                            restaurantNotification
+                                              .save()
+                                              .then((response) => {
+                                                const dinerBody =
+                                                  JSON.stringify({
+                                                    title: "Order paid",
+                                                    description: `Your Order was sent to ${restaurant.businessName} restaurant`,
+                                                    icon: `${process.env.ICON}`,
+                                                  });
+
+                                                webPush
+                                                  .sendNotification(
+                                                    req.diner.pushSubscription,
+                                                    dinerBody
+                                                  )
+                                                  .then(async (response) => {
+                                                    const dinernotification =
+                                                      new Notification({
+                                                        diner: req.diner._id,
+                                                        title:
+                                                          "New Order Placed",
+                                                        body: `${dish.name} order is placed`,
+                                                        createdAt: Date.now(),
+                                                      });
+
+                                                    dinernotification
+                                                      .save()
+                                                      .then((response) => {
+                                                        session.commitTransaction();
+                                                        session.endSession();
+                                                      })
+                                                      .catch((err) => {
+                                                        throw new Error(
+                                                          "diner notification not saved"
+                                                        );
+                                                      });
+                                                  })
+                                                  .catch((err) => {
+                                                    throw new Error(
+                                                      "restaurant notification not sent"
+                                                    );
+                                                  });
+                                              })
+                                              .catch((err) => {
+                                                throw new Error(
+                                                  "restaurant notification not saved"
+                                                );
+                                              });
+                                          })
+                                          .catch((err) => {
+                                            throw new Error(
+                                              "restaurant notification not sent"
+                                            );
+                                          });
+                                      })
+                                      .catch((error) => {
+                                        throw new Error("restaurant not found");
                                       });
-
-                                    webPush
-                                      .sendNotification(
-                                        req.diner.pushSubscription,
-                                        dinerBody
-                                      )
-                                      .catch((err) => {
-                                        throw new Error(
-                                          "restaurant notification not sent"
-                                        );
-                                      });
-
-                                    session.commitTransaction();
-                                    session.endSession();
                                   })
-                                  .catch((error) => {
-                                    throw new Error("restaurant not found");
+                                  .catch((err) => {
+                                    throw new Error("cart item not deleted");
                                   });
                               })
                               .catch((err) => {
@@ -146,12 +192,7 @@ exports.create = async (req, res) => {
           }
         })
         .catch(async (err) => {
-          await session.abortTransaction();
-          session.endSession();
-          return res.json({
-            status: "error",
-            message: err.message,
-          });
+          throw new Error("item not found in cart");
         });
     } catch (err) {
       await session.abortTransaction();
@@ -162,6 +203,11 @@ exports.create = async (req, res) => {
       });
     }
   }
+
+  return res.json({
+    status: "success",
+    message: "orders placed",
+  });
 };
 
 exports.allOrders = async (req, res) => {
