@@ -145,7 +145,7 @@ exports.create = async (req, res) => {
             throw new Error("item not found in cart");
           }
         })
-        .catch((err) => {
+        .catch(async (err) => {
           await session.abortTransaction();
           session.endSession();
           return res.json({
