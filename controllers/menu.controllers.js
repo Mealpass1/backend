@@ -9,7 +9,7 @@ const Order = require("../models/order.model");
 const Notification = require("../models/notifications.model");
 
 exports.getMenu = async (req, res) => {
-  await Menu.find({ diner: req.diner._id, status: "approved" })
+  await Menu.find({ diner: req.diner._id })
     .populate("order")
     .populate("dish")
     .populate("diner")
