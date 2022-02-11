@@ -91,6 +91,7 @@ exports.shareOrder = async (req, res) => {
             )
             .then(async (response) => {
               const notification = new Notification({
+                inviter: req.diner._id,
                 diner: email?._id || username?._id,
                 title: "Meal share",
                 body: `@${req.diner.username} invited you to share meal`,
@@ -133,3 +134,35 @@ exports.shareOrder = async (req, res) => {
     message: "order shared",
   });
 };
+
+exports.acceptShare = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const data = {
+      inviter: req.body.inviter,
+      order: req.body.order,
+    };
+
+    await Menu.findOne({ diner: data.inviter })
+      .then(async (response) => {})
+      .catch((err) => {
+        throw new Error("menu not found");
+      });
+  } catch (error) {
+    await session.abortTransaction();
+    await session.endSession();
+    return res.json({
+      status: "error",
+      message: error.message,
+    });
+  }
+
+  return res.json({
+    status: "success",
+    message: "meal shared",
+  });
+};
+
+exports.declineShare = async (req, res) => {};
