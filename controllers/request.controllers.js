@@ -1,6 +1,7 @@
 //libraries
 const webPush = require("web-push");
 const dotenv = require("dotenv").config();
+const mongoose = require("mongoose");
 
 //files
 const Dish = require("../models/dish.model");
@@ -11,122 +12,130 @@ const Restaurant = require("../models/restaurant.model");
 const Notification = require("../models/notifications.model");
 
 exports.create = async (req, res) => {
-  const data = {
-    diner: req.body.diner,
-    dish: req.body.dish,
-    order: req.body.order,
-    restaurant: req.body.restaurant,
-    menu: req.body.menu,
-    status: "pending",
-    quantity: 1,
-  };
+  const session = mongoose.startSession();
+  await session.startTransaction();
 
-  await Dish.findById(data.dish).then(async (dish) => {
-    if (!dish) {
-      return res.json({
-        status: "error",
-        message: "dish doesn't exist",
-      });
-    } else {
-      await Order.findById(data.order).then(async (order) => {
-        if (!order) {
-          return res.json({
-            status: "error",
-            message: "order doesn't exist",
-          });
-        } else {
-          await Dish.findByIdAndUpdate(data.dish, {
-            $inc: { "stats.used": data.quantity },
-            $inc: { "stats.unused": parseInt(-data.quantity) },
-          })
-            .then(async (response) => {
-              await Menu.findByIdAndUpdate(data.menu, {
-                $push: {
-                  usage: {
-                    date: Date.now(),
-                    quantity: data.quantity,
-                    status: "pending",
-                  },
-                },
-              })
-                .then(async (response) => {
-                  Order.findByIdAndUpdate(data.order, {
-                    $inc: { "mealServing.used": data.quantity },
-                    $inc: { "mealServing.unused": parseInt(-data.quantity) },
-                  }).then(async (response) => {
-                    const request = new Request({
-                      diner: data.diner,
-                      dish: data.dish,
-                      order: data.order,
-                      restaurant: data.restaurant,
-                      status: data.status,
+  try {
+    const data = {
+      diner: req.body.diner,
+      dish: req.body.dish,
+      order: req.body.order,
+      restaurant: req.body.restaurant,
+      menu: req.body.menu,
+      status: "pending",
+      quantity: 1,
+    };
+
+    await Dish.findById(data.dish).then(async (dish) => {
+      if (!dish) {
+        throw new Error("dish not found");
+      } else {
+        await Order.findById(data.order).then(async (order) => {
+          if (!order) {
+            throw new Error("error not found");
+          } else {
+            await Dish.findByIdAndUpdate(data.dish, {
+              $inc: { "stats.used": +data.quantity },
+              $inc: { "stats.unused": -data.quantity },
+            })
+              .then(async (response) => {
+                await Menu.findByIdAndUpdate(data.menu, {
+                  $push: {
+                    usage: {
+                      date: Date.now(),
                       quantity: data.quantity,
-                      createdAt: Date.now(),
-                    });
-                    request
-                      .save()
-                      .then((response) => {
-                        const notification = new Notification({
-                          restaurant: data.restaurant,
-                          title: "Meal request",
-                          body: `${req.diner.username} made a meal request`,
-                          createdAt: Date.now(),
-                        });
+                      status: "pending",
+                    },
+                  },
+                })
+                  .then(async (response) => {
+                    Order.findByIdAndUpdate(data.order, {
+                      $inc: { "mealServing.used": +data.quantity },
+                      $inc: { "mealServing.unused": parseInt(-data.quantity) },
+                    }).then(async (response) => {
+                      const request = new Request({
+                        diner: data.diner,
+                        dish: data.dish,
+                        order: data.order,
+                        restaurant: data.restaurant,
+                        status: data.status,
+                        quantity: data.quantity,
+                        createdAt: Date.now(),
+                      });
+                      request.save().then((response) => {
+                        await Restaurant.findById(data.restaurant)
+                          .then((restaurant) => {
+                            const body = JSON.stringify({
+                              title: "New meal request",
+                              description: `${req.diner.username} made a meal request`,
+                              icon: `${process.env.ICON}`,
+                            });
 
-                        notification
-                          .save()
-                          .then(async (response) => {
-                            await Restaurant.findById(data.restaurant).then(
-                              (restaurant) => {
-                                const body = JSON.stringify({
-                                  title: "New meal request",
-                                  description: `${req.diner.username} made a meal request`,
-                                  icon: `${process.env.ICON}`,
+                            webPush
+                              .sendNotification(
+                                restaurant.pushSubscription,
+                                body
+                              )
+                              .then(async (response) => {
+                                const notification = new Notification({
+                                  restaurant: data.restaurant,
+                                  title: "Meal request",
+                                  body: `${req.diner.username} made a meal request`,
+                                  createdAt: Date.now(),
                                 });
 
-                                webPush.sendNotification(
-                                  restaurant.pushSubscription,
-                                  body
-                                );
+                                notification
+                                  .save()
+                                  .then(async (response) => {
+                                    await session.commitTransaction();
+                                    await session.endSession();
+                                  })
+                                  .catch((err) => {
+                                    return res.json({
+                                      status: "error",
+                                      message: err.message,
+                                    });
+                                  });
+                              })
+                              .catch((err) => {
+                                throw new Error("notification not sent");
+                              });
 
-                                return res.json({
-                                  status: "success",
-                                  message: "request made",
-                                });
-                              }
-                            );
+                            return res.json({
+                              status: "success",
+                              message: "request made",
+                            });
                           })
                           .catch((err) => {
-                            return res.json({
-                              status: "error",
-                              message: err.message,
-                            });
+                            throw new Error("restaurant not found");
                           });
-                      })
-                      .catch((err) => {
-                        return res.json({
-                          status: "error",
-                          message: err.message,
-                        });
                       });
+                      throw new Error("request not saved");
+                    });
+                  })
+                  .catch((error) => {
+                    throw new Error("menu not updated");
                   });
-                })
-                .catch((error) => {
-                  return res.json({
-                    status: "error",
-                    message: error.message,
-                  });
-                });
-            })
-            .catch((error) => {
-              return res.json({
-                status: "error",
-                message: error.message,
+              })
+              .catch((error) => {
+                throw new Error("dish not updated");
               });
-            });
-        }
-      });
-    }
+          }
+        });
+      }
+    });
+  } catch (error) {
+    await session.abortTransaction();
+    await session.endSession();
+    return res.json({
+      status: "error",
+      message: error.message,
+    });
+  }
+
+  return res.json({
+    status: "success",
+    message: "request sent",
   });
 };
 
