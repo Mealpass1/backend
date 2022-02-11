@@ -94,7 +94,6 @@ exports.shareOrder = async (req, res) => {
                 diner: email?._id || username?._id,
                 title: "Meal share",
                 body: `@${req.diner.username} invited you to share meal`,
-                menu: `${menu._id}`,
                 order: `${order._id}`,
                 dish: `${data.dish}`,
                 createdAt: Date.now(),
