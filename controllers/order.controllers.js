@@ -132,10 +132,12 @@ exports.create = async (req, res) => {
 
                                                     dinernotification
                                                       .save()
-                                                      .then((response) => {
-                                                        session.commitTransaction();
-                                                        session.endSession();
-                                                      })
+                                                      .then(
+                                                        async (response) => {
+                                                          await session.commitTransaction();
+                                                          await session.endSession();
+                                                        }
+                                                      )
                                                       .catch((err) => {
                                                         throw new Error(
                                                           "diner notification not saved"
@@ -196,7 +198,7 @@ exports.create = async (req, res) => {
         });
     } catch (err) {
       await session.abortTransaction();
-      session.endSession();
+      await session.endSession();
       return res.json({
         status: "error",
         message: err.message,
