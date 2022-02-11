@@ -3,12 +3,16 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const notificationSchema = new Schema({
+  inviter: {
+    type: mongoose.Types.ObjectId,
+    ref: "Diner",
+  },
   diner: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Types.ObjectId,
     ref: "Diner",
   },
   restaurant: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Types.ObjectId,
     ref: "Restaurant",
   },
   title: {
@@ -20,15 +24,15 @@ const notificationSchema = new Schema({
     required: true,
   },
   menu: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Types.ObjectId,
     ref: "Menu",
   },
   order: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Types.ObjectId,
     ref: "Order",
   },
   dish: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Types.ObjectId,
     ref: "Dish",
   },
   seen: {
