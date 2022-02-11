@@ -9,7 +9,7 @@ const Menu = require("../models/menu.model");
 const Cart = require("../models/cart.model");
 
 exports.createDish = async (req, res) => {
-  const session = mongoose.startSession();
+  const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
@@ -106,8 +106,8 @@ exports.oneDish = async (req, res) => {
 };
 
 exports.deleteDish = async (req, res) => {
-  const session = mongoose.startSession();
-  await session.startTransaction();
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
   try {
     await Dish.findById(req.params.id)

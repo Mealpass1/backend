@@ -51,8 +51,8 @@ exports.getOrder = async (req, res) => {
 };
 
 exports.shareOrder = async (req, res) => {
-  const session = mongoose.startSession();
-  await session.startTransaction();
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
   try {
     const data = {
