@@ -10,7 +10,7 @@ const Cart = require("../models/cart.model");
 
 exports.createDish = async (req, res) => {
   const session = mongoose.startSession();
-  await session.startTransaction();
+  session.startTransaction();
 
   try {
     const data = {

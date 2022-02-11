@@ -13,7 +13,7 @@ const Notification = require("../models/notifications.model");
 
 exports.create = async (req, res) => {
   const session = mongoose.startSession();
-  await session.startTransaction();
+  (await session).startTransaction;
 
   try {
     const data = {
@@ -62,55 +62,59 @@ exports.create = async (req, res) => {
                         quantity: data.quantity,
                         createdAt: Date.now(),
                       });
-                      request.save().then(async (response) => {
-                        await Restaurant.findById(data.restaurant)
-                          .then((restaurant) => {
-                            const body = JSON.stringify({
-                              title: "New meal request",
-                              description: `${req.diner.username} made a meal request`,
-                              icon: `${process.env.ICON}`,
-                            });
-
-                            webPush
-                              .sendNotification(
-                                restaurant.pushSubscription,
-                                body
-                              )
-                              .then(async (response) => {
-                                const notification = new Notification({
-                                  restaurant: data.restaurant,
-                                  title: "Meal request",
-                                  body: `${req.diner.username} made a meal request`,
-                                  createdAt: Date.now(),
-                                });
-
-                                notification
-                                  .save()
-                                  .then(async (response) => {
-                                    await session.commitTransaction();
-                                    await session.endSession();
-                                  })
-                                  .catch((err) => {
-                                    return res.json({
-                                      status: "error",
-                                      message: err.message,
-                                    });
-                                  });
-                              })
-                              .catch((err) => {
-                                throw new Error("notification not sent");
+                      request
+                        .save()
+                        .then(async (response) => {
+                          await Restaurant.findById(data.restaurant)
+                            .then((restaurant) => {
+                              const body = JSON.stringify({
+                                title: "New meal request",
+                                description: `${req.diner.username} made a meal request`,
+                                icon: `${process.env.ICON}`,
                               });
 
-                            return res.json({
-                              status: "success",
-                              message: "request made",
+                              webPush
+                                .sendNotification(
+                                  restaurant.pushSubscription,
+                                  body
+                                )
+                                .then(async (response) => {
+                                  const notification = new Notification({
+                                    restaurant: data.restaurant,
+                                    title: "Meal request",
+                                    body: `${req.diner.username} made a meal request`,
+                                    createdAt: Date.now(),
+                                  });
+
+                                  notification
+                                    .save()
+                                    .then(async (response) => {
+                                      await session.commitTransaction();
+                                      await session.endSession();
+                                    })
+                                    .catch((err) => {
+                                      return res.json({
+                                        status: "error",
+                                        message: err.message,
+                                      });
+                                    });
+                                })
+                                .catch((err) => {
+                                  throw new Error("notification not sent");
+                                });
+
+                              return res.json({
+                                status: "success",
+                                message: "request made",
+                              });
+                            })
+                            .catch((err) => {
+                              throw new Error("restaurant not found");
                             });
-                          })
-                          .catch((err) => {
-                            throw new Error("restaurant not found");
-                          });
-                      });
-                      throw new Error("request not saved");
+                        })
+                        .catch((err) => {
+                          throw new Error("request not saved");
+                        });
                     });
                   })
                   .catch((error) => {
