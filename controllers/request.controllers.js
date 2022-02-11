@@ -62,7 +62,7 @@ exports.create = async (req, res) => {
                         quantity: data.quantity,
                         createdAt: Date.now(),
                       });
-                      request.save().then((response) => {
+                      request.save().then(async (response) => {
                         await Restaurant.findById(data.restaurant)
                           .then((restaurant) => {
                             const body = JSON.stringify({
