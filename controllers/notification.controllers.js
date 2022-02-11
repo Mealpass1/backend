@@ -54,6 +54,7 @@ exports.restaurantSubscribe = async (req, res) => {
 
 exports.dinerNotifications = async (req, res) => {
   await Notification.find({ diner: req.diner._id })
+    .populate("dish")
     .then((response) => {
       return res.json({
         status: "success",
