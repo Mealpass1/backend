@@ -28,6 +28,7 @@ if (cluster.isPrimary) {
   const menuRoutes = require("./routes/menu.routes");
   const requestRoutes = require("./routes/request.routes");
   const notificationRoutes = require("./routes/notification.routes");
+  const adminRoutes = require("./routes/admin.routes");
 
   //initialize app
   const app = express();
@@ -56,6 +57,7 @@ if (cluster.isPrimary) {
   app.use("/menu", menuRoutes);
   app.use("/request", requestRoutes);
   app.use("/notification", notificationRoutes);
+  app.use("/admin", adminRoutes);
 
   //reserved endpoints
   app.get("/", (req, res) => {
