@@ -6,6 +6,8 @@ const dotenv = require("dotenv").config();
 //files
 const Admin = require("../models/admin.model");
 
+const sendEmail = require("../services/admin-email.service");
+
 exports.signup = async (req, res) => {
   const data = {
     email: req.body.email,
@@ -24,7 +26,7 @@ exports.signup = async (req, res) => {
         .hash(data.password, salt)
         .then(async (hashedPassword) => {
           const admin = new Admin({
-            email: date.email,
+            email: data.email,
             password: hashedPassword,
             names: data.names,
           });
@@ -32,6 +34,7 @@ exports.signup = async (req, res) => {
           await admin
             .save()
             .then((response) => {
+              sendEmail(data.email, data.names);
               return res.json({
                 status: "success",
                 message: "admin created",
