@@ -62,9 +62,9 @@ exports.login = async (req, res) => {
     password: req.body.password,
   };
 
-  await Admin.find({ email: data.email })
+  await Admin.findOne({ email: data.email })
     .then(async (admin) => {
-      if (!admin[0]) {
+      if (!admin) {
         return res.json({
           status: "error",
           message: "no admin",
