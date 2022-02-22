@@ -1,6 +1,8 @@
 //packages
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv").config();
+
 //files
 const Admin = require("../models/admin.model");
 
