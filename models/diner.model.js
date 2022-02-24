@@ -15,6 +15,11 @@ const dinerSchema = new Schema({
     type: String,
     required: true,
   },
+  image: {
+    type: String,
+    default:
+      "https://res.cloudinary.com/f-studios/image/upload/v1645706088/mealpass/img_135335_lp1nvc.png",
+  },
   password: {
     type: String,
     required: true,

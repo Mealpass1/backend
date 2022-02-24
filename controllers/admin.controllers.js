@@ -100,3 +100,20 @@ exports.login = async (req, res) => {
       });
     });
 };
+
+exports.getAdmin = async (req, res) => {
+  await Admin.findOne({ _id: req.admin._id })
+    .then((response) => {
+      return res.json({
+        status: "success",
+        message: "admin",
+        data: response,
+      });
+    })
+    .catch((err) => {
+      return res.json({
+        status: "error",
+        message: err.message,
+      });
+    });
+};
