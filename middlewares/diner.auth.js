@@ -16,10 +16,32 @@ const auth = async (req, res, next) => {
       `${process.env.SECRET}`,
       async (err, decoded) => {
         if (err) {
-          return res.json({
-            status: "error",
-            message: "Not Authorised to this service",
-          });
+          jwt.verify(
+            req.headers.auth,
+            `${process.env.ADMINSECRET}`,
+            async (err, decoded) => {
+              if (err) {
+                return res.json({
+                  status: "error",
+                  message: "Not Authorised to this service",
+                });
+              } else {
+                await Diner.findOne({ username: req.body.username }).then(
+                  (diner) => {
+                    if (!diner) {
+                      return res.json({
+                        status: "error",
+                        message: "diner not found",
+                      });
+                    } else {
+                      req.diner = diner;
+                      next();
+                    }
+                  }
+                );
+              }
+            }
+          );
         } else {
           await Diner.findOne({ _id: decoded.id }).then((diner) => {
             if (!diner) {
