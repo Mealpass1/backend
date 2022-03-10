@@ -15,7 +15,7 @@ const router = express.Router();
 router.post("/signup", signup);
 router.post("/login", login);
 router.put("/logout", authMiddleware, logout);
-router.get("/", allDiners);
-router.get("/:id", oneDiner);
+router.get("/diners", allDiners);
+router.get("/", authMiddleware, oneDiner);
 
 module.exports = router;
