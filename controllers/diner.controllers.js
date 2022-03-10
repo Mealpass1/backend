@@ -142,11 +142,7 @@ exports.login = async (req, res) => {
 };
 
 exports.logout = async (req, res) => {
-  const data = {
-    id: req.params.id,
-  };
-
-  await Diner.findByIdAndUpdate(data.id, {
+  await Diner.findByIdAndUpdate(req.diner._id, {
     status: "offline",
   })
     .then((response) => {
