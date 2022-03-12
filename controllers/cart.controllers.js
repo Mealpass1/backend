@@ -23,7 +23,7 @@ exports.addDish = async (req, res) => {
   } else {
     const cart = new Cart({
       dish: req.body.dish,
-      diner: req.diner._id,
+      owner: req.diner._id,
       restaurant: req.body.restaurant,
       quantity: data.quantity,
       timeOfMeal: data.timeOfMeal,
