@@ -1,4 +1,6 @@
-import Package from "../models/package.model";
+const mongoose = require("mongoose");
+const Package = require("../models/package.model");
+const Cart = require("../models/admin-cart.model");
 
 exports.create = async (req, res) => {
   const data = {
@@ -8,6 +10,9 @@ exports.create = async (req, res) => {
     dishes: req.body.dishes,
     restaurants: req.body.restaurants,
   };
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
   const basket = new Package({
     name: data.name,
@@ -20,12 +25,29 @@ exports.create = async (req, res) => {
   await basket
     .save()
     .then((response) => {
-      return res.json({
-        status: "success",
-        message: "package created",
+      data.dishes.forEach(async (dish) => {
+        await Cart.findByIdAndRemove(dish, async (err, dov) => {
+          if (err) {
+            await session.commitTransaction();
+            await session.endSession();
+            return res.json({
+              status: "error",
+              message: err.message,
+            });
+          } else {
+            await session.commitTransaction();
+            await session.endSession();
+            return res.json({
+              status: "success",
+              message: "package created",
+            });
+          }
+        }).clone();
       });
     })
-    .catch((err) => {
+    .catch(async (err) => {
+      await session.commitTransaction();
+      await session.endSession();
       return res.json({
         status: "error",
         message: err.message,
