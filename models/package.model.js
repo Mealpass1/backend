@@ -23,6 +23,17 @@ const packageSchema = new Schema({
     type: Number,
     default: 0,
   },
+  subscribers: {
+    type: Number,
+    default: 0,
+  },
+  revenue: {
+    type: Number,
+    default: 0,
+  },
+  createdAt: {
+    type: Date,
+  },
 });
 
 module.exports = mongoose.model("Package", packageSchema);

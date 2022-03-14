@@ -57,6 +57,8 @@ exports.create = async (req, res) => {
 
 exports.packages = async (req, res) => {
   await Package.find({})
+    // .populate("restaurants")
+    .exec()
     .then((response) => {
       return res.json({
         status: "success",
