@@ -22,8 +22,8 @@ exports.addDish = async (req, res) => {
     });
   } else {
     const cart = new Cart({
-      dish: req.body.dish,
       owner: req.diner._id,
+      dish: req.body.dish,
       restaurant: req.body.restaurant,
       quantity: data.quantity,
       timeOfMeal: data.timeOfMeal,
@@ -68,7 +68,7 @@ exports.addDish = async (req, res) => {
 };
 
 exports.getAll = async (req, res) => {
-  await Cart.find({ diner: req.diner._id })
+  await Cart.find({ owner: req.diner._id })
     .populate("dish")
     .populate("restaurant")
     .then((items) => {

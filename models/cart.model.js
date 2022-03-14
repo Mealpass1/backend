@@ -5,15 +5,11 @@ const Schema = mongoose.Schema;
 const cartSchema = new Schema({
   owner: {
     type: mongoose.Types.ObjectId,
-    required: true,
+    ref: "Diner",
   },
   dish: {
     type: mongoose.Types.ObjectId,
     ref: "Dish",
-  },
-  diner: {
-    type: mongoose.Types.ObjectId,
-    ref: "Diner",
   },
   restaurant: {
     type: mongoose.Types.ObjectId,
