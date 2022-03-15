@@ -20,6 +20,7 @@ exports.create = async (req, res) => {
     restaurants: data.restaurants,
     dishes: data.dishes,
     price: data.price,
+    createdAt: Date.now(),
   });
 
   await basket
@@ -57,8 +58,9 @@ exports.create = async (req, res) => {
 
 exports.packages = async (req, res) => {
   await Package.find({})
-    // .populate("restaurants")
-    .exec()
+    .populate({
+      path: "restaurants",
+    })
     .then((response) => {
       return res.json({
         status: "success",
