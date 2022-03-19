@@ -1,7 +1,6 @@
 const joi = require("joi");
 
 const Cart = require("../models/admin-cart.model");
-const Admin = require("../models/admin.model");
 
 exports.addDish = async (req, res) => {
   const data = {
@@ -68,19 +67,20 @@ exports.getAll = async (req, res) => {
 };
 
 exports.deleteDish = async (req, res) => {
-  await Cart.findByIdAndRemove(req.params.id, async (err, item) => {
-    if (err) {
+  await Cart.findByIdAndRemove(req.params.id)
+    .clone()
+    .then((response) => {
+      return res.json({
+        status: "success",
+        message: "item deleted",
+      });
+    })
+    .catch((err) => {
       return res.json({
         status: "error",
         message: err.message,
       });
-    } else {
-      return res.json({
-        status: "success",
-        message: "dish deleted",
-      });
-    }
-  });
+    });
 };
 
 exports.updateDish = async (req, res) => {

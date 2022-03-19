@@ -22,7 +22,15 @@ const packageSchema = new Schema({
   },
   dishes: {
     type: [
-      { name: String, id: { type: mongoose.Types.ObjectId, ref: "Dish" } },
+      {
+        dish: { type: mongoose.Types.ObjectId, ref: "Dish" },
+        restaurant: { type: mongoose.Types.ObjectId, ref: "Restaurant" },
+        quantity: Number,
+        timeOfMeal: String,
+        daysInWeek: [String],
+        deliveryMode: String,
+        mealServing: Number,
+      },
     ],
     required: true,
   },
@@ -33,6 +41,11 @@ const packageSchema = new Schema({
   subscribers: {
     type: Number,
     default: 0,
+  },
+  image: {
+    type: String,
+    default:
+      "https://res.cloudinary.com/f-studios/image/upload/v1647729275/mealpass/subscription-beef-box-1-meatme_dcee3664-567e-42a4-a870-df5fce4e5c05_mtdf2k.png",
   },
   revenue: {
     type: Number,

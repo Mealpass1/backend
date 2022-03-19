@@ -14,53 +14,47 @@ exports.create = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
-  const basket = new Package({
-    name: data.name,
-    mealServing: data.mealServing,
-    restaurants: data.restaurants,
-    dishes: data.dishes,
-    price: data.price,
-    createdAt: Date.now(),
-  });
-
-  await basket
-    .save()
-    .then((response) => {
-      data.dishes.forEach(async (dish) => {
-        await Cart.findByIdAndRemove(dish, async (err, dov) => {
-          if (err) {
-            await session.commitTransaction();
-            await session.endSession();
-            return res.json({
-              status: "error",
-              message: err.message,
-            });
-          } else {
-            await session.commitTransaction();
-            await session.endSession();
-            return res.json({
-              status: "success",
-              message: "package created",
-            });
-          }
-        }).clone();
-      });
-    })
-    .catch(async (err) => {
-      await session.commitTransaction();
-      await session.endSession();
-      return res.json({
-        status: "error",
-        message: err.message,
-      });
+  try {
+    const basket = new Package({
+      name: data.name,
+      mealServing: data.mealServing,
+      restaurants: data.restaurants,
+      dishes: data.dishes,
+      price: data.price,
+      createdAt: Date.now(),
     });
+
+    await basket
+      .save()
+      .then((response) => {
+        data.dishes.forEach(async (dish) => {
+          await Cart.findOneAndDelete({ dish: dish.dish })
+            .clone()
+            .catch((err) => {
+              throw new Error(err);
+            });
+        });
+        return res.json({
+          status: "success",
+          message: "package created",
+        });
+      })
+      .catch((err) => {
+        throw new Error(err.message);
+      });
+  } catch (error) {
+    await session.abortTransaction();
+    await session.endSession();
+    return res.json({
+      status: "error",
+      message: error.message,
+    });
+  }
 };
 
 exports.packages = async (req, res) => {
   await Package.find({})
-    .populate({
-      path: "restaurants",
-    })
+    .populate("dishes.dish")
     .then((response) => {
       return res.json({
         status: "success",
