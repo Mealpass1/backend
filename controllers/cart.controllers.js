@@ -20,6 +20,8 @@ exports.addDish = async (req, res) => {
     return total + topping.price;
   }, 0);
 
+  console.log(toppingsPrice);
+
   const { error } = cartSchema.validate(data);
 
   if (error) {
