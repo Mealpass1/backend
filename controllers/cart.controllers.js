@@ -9,9 +9,16 @@ exports.addDish = async (req, res) => {
     timeOfMeal: req.body.timeOfMeal,
     daysInWeek: req.body.daysInWeek,
     deliveryMode: req.body.deliveryMode,
-    repeatesInMonth: req.body.repeatesInMonth,
+    toppings: req.body.toppings,
     price: req.body.price,
+    discount: req.body.discount,
   };
+
+  const discount = data.discount >= 1 ? (data.price * data.discount) / 100 : 0;
+  const realPrice = data.price - discount;
+  let toppingsPrice = data.toppings.reduce((total, topping) => {
+    return total + topping.price;
+  }, 0);
 
   const { error } = cartSchema.validate(data);
 
@@ -29,34 +36,19 @@ exports.addDish = async (req, res) => {
       timeOfMeal: data.timeOfMeal,
       daysInWeek: data.daysInWeek,
       deliveryMode: data.deliveryMode,
-      repeatsInMonth: data.repeatesInMonth,
-      mealServing:
-        data.quantity * data.daysInWeek.length * data.repeatesInMonth,
+      toppings: data.toppings,
+      mealServing: data.quantity * data.daysInWeek.length,
       createdAt: Date.now(),
       subTotal:
-        data.quantity *
-        data.daysInWeek.length *
-        data.repeatesInMonth *
-        data.price,
+        data.quantity * realPrice * data.daysInWeek.length + toppingsPrice,
     });
     await cart
       .save()
-      .then(async (item) => {
-        await Diner.findByIdAndUpdate(item.diner, {
-          $push: { cart: item._id },
-        })
-          .then((response) => {
-            return res.json({
-              status: "success",
-              message: "dish added to cart",
-            });
-          })
-          .catch((err) => {
-            return res.json({
-              status: "error",
-              message: err.message,
-            });
-          });
+      .then((item) => {
+        return res.json({
+          status: "success",
+          message: "dish added to cart",
+        });
       })
       .catch((err) => {
         return res.json({
