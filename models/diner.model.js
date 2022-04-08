@@ -24,9 +24,6 @@ const dinerSchema = new Schema({
     type: String,
     required: true,
   },
-  cart: {
-    type: [{ type: mongoose.Types.ObjectId, ref: "Dish" }],
-  },
   status: {
     type: String,
     enum: ["online", "offline"],
