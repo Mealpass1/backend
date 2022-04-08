@@ -152,7 +152,6 @@ exports.logout = async (req, res) => {
 
 exports.allRestaurants = async (req, res) => {
   await Restaurant.find({})
-    .populate("dishes")
     .then((restaurants) => {
       return res.json({
         status: "success",
