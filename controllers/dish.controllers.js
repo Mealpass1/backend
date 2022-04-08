@@ -19,7 +19,8 @@ exports.createDish = async (req, res) => {
       description: req.body.description,
       discount: req.body.discount,
       category: req.body.category,
-      image: req.file.path,
+      // image: req.file.path,
+      toppings: req.body.toppings,
     };
 
     if (!req.restaurant.dishTypes.includes(data.category)) {
@@ -35,7 +36,8 @@ exports.createDish = async (req, res) => {
       description: data.description,
       discount: data.discount,
       category: data.category,
-      image: data.image,
+      toppings: data.toppings,
+      // image: data.image,
       createdAt: Date.now(),
     });
 
@@ -54,7 +56,7 @@ exports.createDish = async (req, res) => {
       // });
       // })
       .catch((err) => {
-        throw new Error("dish not created");
+        throw new Error(err.message);
       });
   } catch (error) {
     await session.abortTransaction();
