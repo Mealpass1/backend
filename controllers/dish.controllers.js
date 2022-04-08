@@ -72,7 +72,7 @@ exports.createDish = async (req, res) => {
 };
 
 exports.allDishes = async (req, res) => {
-  await Dish.find({ restaurant: req.restaurant._id })
+  await Dish.find({ restaurant: req.params.id })
     .then((dishes) => {
       return res.json({
         status: "success",
@@ -115,9 +115,10 @@ exports.deleteDish = async (req, res) => {
         if (dish?.stats?.unused > 0) {
           throw new Error("dish can't be deleted");
         } else {
-          const array = dish?.image?.split("/")[0];
+          const array = dish?.image?.split("/");
           const name = array[array.length - 1];
           const token = name.split(".")[0];
+          console.log(token);
           cloudinary.uploader
             .destroy(token)
             .then(async (response) => {
@@ -131,20 +132,11 @@ exports.deleteDish = async (req, res) => {
                       if (err) {
                         throw new Error("dish not deleted from carts");
                       } else {
-                        await Menu.deleteMany(
-                          { dish: dish?._id },
-                          async (err, item) => {
-                            if (err) {
-                              throw new Error("dish not deleted from menus");
-                            } else {
-                              await session.commitTransaction();
-                              await session.endSession();
-                            }
-                          }
-                        );
+                        await session.commitTransaction();
+                        await session.endSession();
                       }
                     }
-                  );
+                  ).clone();
                 }
               });
             })
