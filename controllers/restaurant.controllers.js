@@ -170,7 +170,6 @@ exports.allRestaurants = async (req, res) => {
 
 exports.oneRestaurant = async (req, res) => {
   await Restaurant.findById(req.params.id)
-    .populate("dishes")
     .then((restaurant) => {
       return res.json({
         status: "success",

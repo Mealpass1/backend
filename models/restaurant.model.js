@@ -55,14 +55,14 @@ const restaurantSchema = new Schema({
   createdAt: {
     type: Date,
   },
-  dishes: {
-    type: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "Dish",
-      },
-    ],
-  },
+  // dishes: {
+  //   type: [
+  //     {
+  //       type: mongoose.Types.ObjectId,
+  //       ref: "Dish",
+  //     },
+  //   ],
+  // },
   dishTypes: {
     type: [String],
   },
