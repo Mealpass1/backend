@@ -31,9 +31,17 @@ const cartSchema = new Schema({
     type: String,
     required: true,
   },
-  repeatsInMonth: {
-    type: Number,
-    required: true,
+  // repeatsInMonth: {
+  //   type: Number,
+  //   required: true,
+  // },
+  toppings: {
+    type: [
+      {
+        name: String,
+        price: Number,
+      },
+    ],
   },
   mealServing: {
     type: Number,
