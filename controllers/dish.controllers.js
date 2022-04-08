@@ -42,17 +42,17 @@ exports.createDish = async (req, res) => {
     await dish
       .save()
       .then(async (response) => {
-        await Restaurant.findByIdAndUpdate(req.restaurant._id, {
-          $push: { dishes: response._id },
-        })
-          .then(async (response) => {
-            await session.commitTransaction();
-            await session.endSession();
-          })
-          .catch((err) => {
-            throw new Error("restaurant not updated");
-          });
+        // await Restaurant.findByIdAndUpdate(req.restaurant._id, {
+        //   $push: { dishes: response._id },
+        // })
+        //   .then(async (response) => {
+        await session.commitTransaction();
+        await session.endSession();
       })
+      // .catch((err) => {
+      //   throw new Error("restaurant not updated");
+      // });
+      // })
       .catch((err) => {
         throw new Error("dish not created");
       });
