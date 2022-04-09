@@ -19,9 +19,11 @@ exports.createDish = async (req, res) => {
       description: req.body.description,
       discount: req.body.discount,
       category: req.body.category,
-      // image: req.file.path,
+      image: req.file.path,
       toppings: req.body.toppings,
     };
+
+    console.log(typeof data.toppings);
 
     if (!req.restaurant.dishTypes.includes(data.category)) {
       await Restaurant.findByIdAndUpdate(req.restaurant._id, {
@@ -37,7 +39,7 @@ exports.createDish = async (req, res) => {
       discount: data.discount,
       category: data.category,
       toppings: data.toppings,
-      // image: data.image,
+      image: data.image,
       createdAt: Date.now(),
     });
 

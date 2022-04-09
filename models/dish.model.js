@@ -30,7 +30,7 @@ const dishSchema = new Schema({
   },
   image: {
     type: String,
-    // required: true,
+    required: true,
   },
   createdAt: {
     type: Date,
@@ -63,7 +63,7 @@ const dishSchema = new Schema({
     type: [
       {
         name: String,
-        price: String,
+        price: Number,
       },
     ],
   },

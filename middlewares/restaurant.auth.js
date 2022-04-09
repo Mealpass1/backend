@@ -15,13 +15,14 @@ const auth = async (req, res, next) => {
       req.headers.auth,
       `${process.env.SECRET}`,
       async (err, decoded) => {
+        console.log(decoded);
         if (err) {
           return res.json({
             status: "error",
             message: "Not Authorised to this service",
           });
         } else {
-          await Restaurant.findOne({ _id: decoded.id }).then((restaurant) => {
+          await Restaurant.findById(decoded.id).then((restaurant) => {
             if (!restaurant) {
               return res.json({
                 status: "error",

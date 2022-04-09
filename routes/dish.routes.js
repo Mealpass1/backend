@@ -13,8 +13,8 @@ const upload = require("../services/image.service");
 
 const router = express.Router();
 
-// router.post("/add", authMiddleware, upload.single("picture"), createDish);
-router.post("/add", authMiddleware, createDish);
+router.post("/add", authMiddleware, upload.single("picture"), createDish);
+// router.post("/add", authMiddleware, createDish);
 router.get("/restaurant/:id", allDishes);
 router.get("/:id", oneDish);
 router.delete("/:id", authMiddleware, deleteDish);
