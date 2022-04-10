@@ -23,7 +23,7 @@ exports.createDish = async (req, res) => {
       toppings: req.body.toppings,
     };
 
-    console.log(typeof data.toppings);
+    console.log(JSON.parse(data.toppings));
 
     if (!req.restaurant.dishTypes.includes(data.category)) {
       await Restaurant.findByIdAndUpdate(req.restaurant._id, {
@@ -38,7 +38,7 @@ exports.createDish = async (req, res) => {
       description: data.description,
       discount: data.discount,
       category: data.category,
-      toppings: data.toppings,
+      toppings: JSON.parse(data.toppings),
       image: data.image,
       createdAt: Date.now(),
     });
