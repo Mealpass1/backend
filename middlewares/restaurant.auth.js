@@ -15,7 +15,6 @@ const auth = async (req, res, next) => {
       req.headers.auth,
       `${process.env.SECRET}`,
       async (err, decoded) => {
-        console.log(decoded);
         if (err) {
           return res.json({
             status: "error",
