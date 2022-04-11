@@ -15,9 +15,10 @@ if (cluster.isPrimary) {
   //packages
   const cors = require("cors");
   const path = require("path");
+  const morgan = require("morgan");
+  const webPush = require("web-push");
   const bodyParser = require("body-parser");
   const dotenv = require("dotenv").config();
-  const webPush = require("web-push");
 
   //files
   const dinerRoutes = require("./routes/diner.routes");
@@ -39,8 +40,9 @@ if (cluster.isPrimary) {
 
   //some configurations
   app.use(cors());
-  app.set("view engine", "pug");
+  app.use(morgan("dev"));
   app.use(bodyParser.json());
+  app.set("view engine", "pug");
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(express.static(path.join(__dirname, "public")));
   webPush.setVapidDetails(
