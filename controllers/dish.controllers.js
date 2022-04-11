@@ -23,8 +23,6 @@ exports.createDish = async (req, res) => {
       toppings: req.body.toppings,
     };
 
-    console.log(JSON.parse(data.toppings));
-
     if (!req.restaurant.dishTypes.includes(data.category)) {
       await Restaurant.findByIdAndUpdate(req.restaurant._id, {
         $push: { dishTypes: data.category },
