@@ -11,53 +11,50 @@ exports.addDish = async (req, res) => {
     deliveryMode: req.body.deliveryMode,
     toppings: req.body.toppings,
     price: req.body.price,
-    discount: req.body.discount,
   };
 
-  const discount = data.discount >= 1 ? (data.price * data.discount) / 100 : 0;
-  const realPrice = data.price - discount;
-  let toppingsPrice = data.toppings.reduce((total, topping) => {
-    return total + topping.price;
-  }, 0);
+  try {
+    let toppingsPrice = data.toppings.reduce((total, topping) => {
+      return total + topping.price;
+    }, 0);
 
-  console.log(toppingsPrice);
+    console.log(toppingsPrice);
 
-  const { error } = cartSchema.validate(data);
+    const { error } = cartSchema.validate(data);
 
-  if (error) {
-    return res.json({
-      status: "error",
-      message: error.message,
-    });
-  } else {
-    const cart = new Cart({
-      owner: req.diner._id,
-      dish: req.body.dish,
-      restaurant: req.body.restaurant,
-      quantity: data.quantity,
-      timeOfMeal: data.timeOfMeal,
-      daysInWeek: data.daysInWeek,
-      deliveryMode: data.deliveryMode,
-      toppings: data.toppings,
-      mealServing: data.quantity * data.daysInWeek.length,
-      createdAt: Date.now(),
-      subTotal:
-        data.quantity * realPrice * data.daysInWeek.length + toppingsPrice,
-    });
-    await cart
-      .save()
-      .then((item) => {
+    if (error) {
+      return res.json({
+        status: "error",
+        message: error.message,
+      });
+    } else {
+      const cart = new Cart({
+        owner: req.diner._id,
+        dish: req.body.dish,
+        restaurant: req.body.restaurant,
+        quantity: data.quantity,
+        timeOfMeal: data.timeOfMeal,
+        daysInWeek: data.daysInWeek,
+        deliveryMode: data.deliveryMode,
+        toppings: data.toppings,
+        mealServing: data.quantity * data.daysInWeek.length,
+        createdAt: Date.now(),
+        subTotal:
+          data.quantity * data.price * data.daysInWeek.length +
+          toppingsPrice * data.quantity * data.daysInWeek.length,
+      });
+      await cart.save().then(() => {
         return res.json({
           status: "success",
           message: "dish added to cart",
         });
-      })
-      .catch((err) => {
-        return res.json({
-          status: "error",
-          message: err.message,
-        });
       });
+    }
+  } catch (error) {
+    return res.json({
+      status: "error",
+      message: err.message,
+    });
   }
 };
 
@@ -181,6 +178,6 @@ const cartSchema = joi.object().keys({
   timeOfMeal: joi.string().required(),
   daysInWeek: joi.array().required(),
   deliveryMode: joi.string().required(),
-  repeatesInMonth: joi.number().required(),
   price: joi.number().required(),
+  toppings: joi.array().required(),
 });
