@@ -18,8 +18,6 @@ exports.addDish = async (req, res) => {
       return total + topping.price;
     }, 0);
 
-    console.log(toppingsPrice);
-
     const { error } = cartSchema.validate(data);
 
     if (error) {
@@ -31,6 +29,7 @@ exports.addDish = async (req, res) => {
       const cart = new Cart({
         owner: req.diner._id,
         dish: req.body.dish,
+        price: req.body.price,
         restaurant: req.body.restaurant,
         quantity: data.quantity,
         timeOfMeal: data.timeOfMeal,
@@ -85,23 +84,12 @@ exports.deleteDish = async (req, res) => {
         message: err.message,
       });
     } else {
-      await Diner.findByIdAndUpdate(item.diner, {
-        $pull: { cart: item._id },
-      })
-        .then((response) => {
-          return res.json({
-            status: "success",
-            message: "dish deleted",
-          });
-        })
-        .catch((err) => {
-          return res.json({
-            status: "error",
-            message: err.message,
-          });
-        });
+      return res.json({
+        status: "success",
+        message: "cart item deleted",
+      });
     }
-  });
+  }).clone();
 };
 
 exports.updateDish = async (req, res) => {
@@ -138,21 +126,32 @@ exports.updateMealServing = async (req, res) => {
   const data = {
     mealserving: req.body.mealserving,
   };
-  await Cart.findByIdAndUpdate(req.params.id, {
-    mealServing: data.mealserving,
-  })
-    .then((item) => {
-      return res.json({
-        status: "success",
-        message: "meal serving updated",
-      });
-    })
-    .catch((err) => {
-      return res.json({
-        status: "error",
-        message: err.message,
+
+  try {
+    await Cart.findById(req.params.id).then(async (item) => {
+      let toppingsPrice = item.toppings.reduce((total, topping) => {
+        return total + topping.price;
+      }, 0);
+
+      const subTotal =
+        data.mealserving * item.price + toppingsPrice * data.mealserving;
+
+      await Cart.findByIdAndUpdate(req.params.id, {
+        mealServing: data.mealserving,
+        subTotal: subTotal,
+      }).then(() => {
+        return res.json({
+          status: "success",
+          message: "mealserving updated",
+        });
       });
     });
+  } catch (error) {
+    return res.json({
+      status: "error",
+      message: error.message,
+    });
+  }
 };
 
 exports.oneDish = async (req, res) => {

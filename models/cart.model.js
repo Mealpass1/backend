@@ -11,6 +11,10 @@ const cartSchema = new Schema({
     type: mongoose.Types.ObjectId,
     ref: "Dish",
   },
+  price: {
+    type: String,
+    required: true,
+  },
   restaurant: {
     type: mongoose.Types.ObjectId,
     ref: "Restaurant",
