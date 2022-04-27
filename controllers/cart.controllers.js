@@ -94,32 +94,44 @@ exports.deleteDish = async (req, res) => {
 
 exports.updateDish = async (req, res) => {
   const data = {
-    quantity: req.body.quantity,
+    amount: req.body.amount,
     timeOfMeal: req.body.timeOfMeal,
     daysInWeek: req.body.daysInWeek,
     deliveryMode: req.body.deliveryMode,
-    repeatesInMonth: req.body.repeatesInMonth,
+    toppings: req.body.toppings,
   };
-  await Cart.findByIdAndUpdate(req.params.id, {
-    quantity: data.quantity,
-    timeOfMeal: data.timeOfMeal,
-    daysInWeek: data.daysInWeek,
-    deliveryMode: data.deliveryMode,
-    repeatesInMonth: data.repeatesInMonth,
-    mealServing: data.quantity * data.daysInWeek.length * data.repeatesInMonth,
-  })
-    .then((item) => {
-      return res.json({
-        status: "success",
-        message: "dish updated",
-      });
-    })
-    .catch((err) => {
-      return res.json({
-        status: "error",
-        message: err.message,
+
+  try {
+    await Cart.findById(req.params.id).then(async (item) => {
+      let toppingsPrice = data.toppings.reduce((total, topping) => {
+        return total + topping.price;
+      }, 0);
+
+      const mealServing = data.amount * data.daysInWeek.length;
+
+      const subTotal = mealServing * item.price + toppingsPrice * mealServing;
+
+      await Cart.findByIdAndUpdate(req.params.id, {
+        quantity: data.amount,
+        mealServing: mealServing,
+        timeOfMeal: data.timeOfMeal,
+        daysInWeek: data.daysInWeek,
+        deliveryMode: data.deliveryMode,
+        toppings: data.toppings,
+        subTotal: subTotal,
+      }).then(() => {
+        return res.json({
+          status: "success",
+          message: "item updated",
+        });
       });
     });
+  } catch (error) {
+    return res.json({
+      status: "error",
+      message: error.message,
+    });
+  }
 };
 
 exports.updateMealServing = async (req, res) => {
@@ -170,6 +182,22 @@ exports.oneDish = async (req, res) => {
         message: err.message,
       });
     });
+};
+
+exports.package = async (req, res) => {
+  const data = {
+    owner: req.diner._id,
+    dishes: req.body.dishes,
+    package: req.body.package,
+  };
+
+  try {
+  } catch (error) {
+    return res.json({
+      status: "error",
+      message: error.message,
+    });
+  }
 };
 
 const cartSchema = joi.object().keys({
