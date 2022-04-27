@@ -30,6 +30,14 @@ const packageSchema = new Schema({
         daysInWeek: [String],
         deliveryMode: String,
         mealServing: Number,
+        toppings: {
+          type: [
+            {
+              name: String,
+              price: Number,
+            },
+          ],
+        },
       },
     ],
     required: true,
