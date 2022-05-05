@@ -3,17 +3,10 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const cartSchema = new Schema({
-  owner: {
-    type: mongoose.Types.ObjectId,
-    ref: "Diner",
-  },
+  //dish staffs
   dish: {
     type: mongoose.Types.ObjectId,
     ref: "Dish",
-  },
-  price: {
-    type: String,
-    required: true,
   },
   restaurant: {
     type: mongoose.Types.ObjectId,
@@ -35,10 +28,6 @@ const cartSchema = new Schema({
     type: String,
     required: true,
   },
-  // repeatsInMonth: {
-  //   type: Number,
-  //   required: true,
-  // },
   toppings: {
     type: [
       {
@@ -51,6 +40,32 @@ const cartSchema = new Schema({
     type: Number,
     required: true,
     default: 0,
+  },
+  //packages staffs
+  name: {
+    type: String,
+  },
+  restaurants: {
+    type: [{ type: mongoose.Types.ObjectId, ref: "Restaurant" }],
+    required: true,
+  },
+  dishes: {
+    type: [{ type: mongoose.Types.ObjectId, ref: "Dish" }],
+    required: true,
+  },
+  //common to both
+  owner: {
+    type: mongoose.Types.ObjectId,
+    ref: "Diner",
+  },
+  price: {
+    type: String,
+    required: true,
+  },
+  type: {
+    type: String,
+    required: true,
+    enum: ["package", "dish"],
   },
   subTotal: {
     type: Number,

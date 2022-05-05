@@ -54,7 +54,6 @@ exports.create = async (req, res) => {
 
 exports.packages = async (req, res) => {
   await Package.find({})
-    .populate("dishes.dish")
     .then((response) => {
       return res.json({
         status: "success",
@@ -72,7 +71,6 @@ exports.packages = async (req, res) => {
 
 exports.package = async (req, res) => {
   await Package.findOne({ id: req.params._id })
-    .populate("dishes.dish")
     .then((response) => {
       return res.json({
         status: "success",
