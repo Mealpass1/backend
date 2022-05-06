@@ -46,4 +46,4 @@ const packageItemSchema = new Schema({
   },
 });
 
-module.exports = mongoose.model("Admin-cart", packageItemSchema);
+module.exports = mongoose.model("Package-item", packageItemSchema);

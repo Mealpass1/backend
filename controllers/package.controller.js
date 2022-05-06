@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Package = require("../models/package.model");
 const Cart = require("../models/admin-cart.model");
+const PackageItems = require("../models/package-item.model");
 
 exports.create = async (req, res) => {
   const data = {
@@ -15,33 +16,30 @@ exports.create = async (req, res) => {
   session.startTransaction();
 
   try {
-    const basket = new Package({
-      name: data.name,
-      mealServing: data.mealServing,
-      restaurants: data.restaurants,
-      dishes: data.dishes,
-      price: data.price,
-      createdAt: Date.now(),
-    });
-
-    await basket
-      .save()
-      .then((response) => {
-        data.dishes.forEach(async (dish) => {
-          await Cart.findOneAndDelete({ dish: dish.dish })
-            .clone()
-            .catch((err) => {
-              throw new Error(err);
-            });
-        });
-        return res.json({
-          status: "success",
-          message: "package created",
-        });
-      })
-      .catch((err) => {
-        throw new Error(err.message);
+    PackageItems.insertMany([...data.dishes]).then(async (response) => {
+      const basket = new Package({
+        name: data.name,
+        mealServing: data.mealServing,
+        restaurants: data.restaurants,
+        items: response.insertedIds,
+        price: data.price,
+        createdAt: Date.now(),
       });
+
+      await basket
+        .save()
+        .then((response) => {
+          Cart.deleteMany({}).then((response) => {
+            return res.json({
+              status: "success",
+              message: "package created",
+            });
+          });
+        })
+        .catch((err) => {
+          throw new Error(err.message);
+        });
+    });
   } catch (error) {
     await session.abortTransaction();
     await session.endSession();

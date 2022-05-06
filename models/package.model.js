@@ -15,8 +15,8 @@ const packageSchema = new Schema({
     type: [{ type: mongoose.Types.ObjectId, ref: "Restaurant" }],
     required: true,
   },
-  dishes: {
-    type: [{ type: mongoose.Types.ObjectId, ref: "Dish" }],
+  items: {
+    type: [{ type: mongoose.Types.ObjectId, ref: "Package-item" }],
     required: true,
   },
   price: {
