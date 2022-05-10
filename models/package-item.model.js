@@ -31,6 +31,14 @@ const packageItemSchema = new Schema({
     type: String,
     required: true,
   },
+  toppings: {
+    type: [
+      {
+        name: String,
+        price: Number,
+      },
+    ],
+  },
   mealServing: {
     type: Number,
     required: true,

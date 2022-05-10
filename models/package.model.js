@@ -39,6 +39,10 @@ const packageSchema = new Schema({
     type: Number,
     default: 0,
   },
+  dishes: {
+    type: Number,
+    default: 0,
+  },
   createdAt: {
     type: Date,
   },

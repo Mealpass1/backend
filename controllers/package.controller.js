@@ -21,6 +21,7 @@ exports.create = async (req, res) => {
       name: data.name,
       mealServing: data.mealServing,
       restaurants: data.restaurants,
+      dishes: data.dishes.length,
       price: data.price,
       createdAt: Date.now(),
     });
