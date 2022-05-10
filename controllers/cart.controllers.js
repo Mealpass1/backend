@@ -34,6 +34,7 @@ exports.addDish = async (req, res) => {
         timeOfMeal: data.timeOfMeal,
         daysInWeek: data.daysInWeek,
         deliveryMode: data.deliveryMode,
+        type: "dish",
         toppings: data.toppings,
         mealServing: data.quantity * data.daysInWeek.length,
         createdAt: Date.now(),
@@ -51,7 +52,7 @@ exports.addDish = async (req, res) => {
   } catch (error) {
     return res.json({
       status: "error",
-      message: err.message,
+      message: error.message,
     });
   }
 };
