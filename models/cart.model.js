@@ -12,21 +12,21 @@ const cartSchema = new Schema({
     type: mongoose.Types.ObjectId,
     ref: "Restaurant",
   },
+  price: {
+    type: String,
+    required: true,
+  },
   quantity: {
     type: Number,
-    required: true,
   },
   timeOfMeal: {
     type: String,
-    required: true,
   },
   daysInWeek: {
     type: [String],
-    required: true,
   },
   deliveryMode: {
     type: String,
-    required: true,
   },
   toppings: {
     type: [
@@ -38,29 +38,23 @@ const cartSchema = new Schema({
   },
   mealServing: {
     type: Number,
-    required: true,
     default: 0,
   },
   //packages staffs
-  name: {
-    type: String,
+  package: {
+    type: mongoose.Types.ObjectId,
+    ref: "Package",
   },
   restaurants: {
     type: [{ type: mongoose.Types.ObjectId, ref: "Restaurant" }],
-    required: true,
   },
   dishes: {
     type: [{ type: mongoose.Types.ObjectId, ref: "Dish" }],
-    required: true,
   },
   //common to both
   owner: {
     type: mongoose.Types.ObjectId,
     ref: "Diner",
-  },
-  price: {
-    type: String,
-    required: true,
   },
   type: {
     type: String,

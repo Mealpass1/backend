@@ -12,11 +12,14 @@ const packageSchema = new Schema({
     default: 0,
   },
   restaurants: {
-    type: [{ type: mongoose.Types.ObjectId, ref: "Restaurant" }],
-    required: true,
-  },
-  items: {
-    type: [{ type: mongoose.Types.ObjectId, ref: "Package-item" }],
+    type: [{
+      name: {
+        type: String,
+      },
+      id: {
+        type: mongoose.Types.ObjectId, ref: "Restaurant"
+      }
+    }],
     required: true,
   },
   price: {

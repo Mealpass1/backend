@@ -1,7 +1,6 @@
 const joi = require("joi");
 
 const Cart = require("../models/cart.model");
-const Diner = require("../models/diner.model");
 
 exports.addDish = async (req, res) => {
   const data = {
@@ -61,6 +60,7 @@ exports.getAll = async (req, res) => {
   await Cart.find({ owner: req.diner._id })
     .populate("dish")
     .populate("restaurant")
+    .populate("package")
     .then((items) => {
       return res.json({
         status: "success",
@@ -188,10 +188,31 @@ exports.package = async (req, res) => {
   const data = {
     owner: req.diner._id,
     dishes: req.body.dishes,
+    restaurants: req.body.restaurants,
     package: req.body.package,
+    type: "package",
+    subTotal: req.body.subTotal,
   };
 
   try {
+
+    const package = new Cart({
+      package: data.package,
+      restaurants: data.restaurants,
+      dishes: data.dishes,
+      owner: data.owner,
+      type: data.type,
+      subTotal: data.subTotal,
+      createdAt: Date.now(),
+    })
+
+    package.save().then(() => {
+      return res.json({
+        status: "success",
+        message: "package added to cart",
+      })
+    })
+
   } catch (error) {
     return res.json({
       status: "error",
