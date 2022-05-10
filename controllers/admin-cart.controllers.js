@@ -8,43 +8,60 @@ exports.addDish = async (req, res) => {
     timeOfMeal: req.body.timeOfMeal,
     daysInWeek: req.body.daysInWeek,
     deliveryMode: req.body.deliveryMode,
+    toppings: req.body.toppings,
     price: req.body.price,
   };
 
-  const { error } = cartSchema.validate(data);
+  console.log(data);
 
-  if (error) {
+  try {
+
+    let toppingsPrice = data.toppings.reduce((total, topping) => {
+      return total + topping.price;
+    }, 0);
+
+    const { error } = cartSchema.validate(data);
+
+    if (error) {
+      return res.json({
+        status: "error",
+        message: error.message,
+      });
+    } else {
+      const cart = new Cart({
+        dish: req.body.dish,
+        restaurant: req.body.restaurant,
+        quantity: data.quantity,
+        timeOfMeal: data.timeOfMeal,
+        toppings: data.toppings,
+        daysInWeek: data.daysInWeek,
+        deliveryMode: data.deliveryMode,
+        mealServing: data.quantity * data.daysInWeek.length,
+        createdAt: Date.now(),
+        subTotal: data.quantity * data.daysInWeek.length * data.price + toppingsPrice * data.quantity * data.daysInWeek.length,
+      });
+      await cart
+        .save()
+        .then(async (item) => {
+          return res.json({
+            status: "success",
+            message: "dish added to cart",
+          });
+        })
+        .catch((err) => {
+          return res.json({
+            status: "error",
+            message: err.message,
+          });
+        });
+    }
+  } catch (error) {
     return res.json({
       status: "error",
-      message: error.message,
+      message: err.message,
     });
-  } else {
-    const cart = new Cart({
-      dish: req.body.dish,
-      restaurant: req.body.restaurant,
-      quantity: data.quantity,
-      timeOfMeal: data.timeOfMeal,
-      daysInWeek: data.daysInWeek,
-      deliveryMode: data.deliveryMode,
-      mealServing: data.quantity * data.daysInWeek.length,
-      createdAt: Date.now(),
-      subTotal: data.quantity * data.daysInWeek.length * data.price,
-    });
-    await cart
-      .save()
-      .then(async (item) => {
-        return res.json({
-          status: "success",
-          message: "dish added to cart",
-        });
-      })
-      .catch((err) => {
-        return res.json({
-          status: "error",
-          message: err.message,
-        });
-      });
   }
+
 };
 
 exports.getAll = async (req, res) => {
@@ -85,52 +102,77 @@ exports.deleteDish = async (req, res) => {
 
 exports.updateDish = async (req, res) => {
   const data = {
-    quantity: req.body.quantity,
+    amount: req.body.amount,
     timeOfMeal: req.body.timeOfMeal,
     daysInWeek: req.body.daysInWeek,
     deliveryMode: req.body.deliveryMode,
+    toppings: req.body.toppings,
   };
 
-  await Cart.findByIdAndUpdate(req.params.id, {
-    quantity: data.quantity,
-    timeOfMeal: data.timeOfMeal,
-    daysInWeek: data.daysInWeek,
-    deliveryMode: data.deliveryMode,
-    mealServing: data.quantity * data.daysInWeek.length,
-  })
-    .then((item) => {
-      return res.json({
-        status: "success",
-        message: "dish updated",
-      });
-    })
-    .catch((err) => {
-      return res.json({
-        status: "error",
-        message: err.message,
+  try {
+    await Cart.findById(req.params.id).then(async (item) => {
+      let toppingsPrice = data.toppings.reduce((total, topping) => {
+        return total + topping.price;
+      }, 0);
+
+      const mealServing = data.amount * data.daysInWeek.length;
+
+      const subTotal = mealServing * item.price + toppingsPrice * mealServing;
+
+      await Cart.findByIdAndUpdate(req.params.id, {
+        quantity: data.amount,
+        mealServing: mealServing,
+        timeOfMeal: data.timeOfMeal,
+        daysInWeek: data.daysInWeek,
+        deliveryMode: data.deliveryMode,
+        toppings: data.toppings,
+        subTotal: subTotal,
+      }).then(() => {
+        return res.json({
+          status: "success",
+          message: "item updated",
+        });
       });
     });
+  } catch (error) {
+    return res.json({
+      status: "error",
+      message: error.message,
+    });
+  }
 };
 
 exports.updateMealServing = async (req, res) => {
   const data = {
     mealserving: req.body.mealserving,
   };
-  await Cart.findByIdAndUpdate(req.params.id, {
-    mealServing: data.mealserving,
-  })
-    .then((item) => {
-      return res.json({
-        status: "success",
-        message: "meal serving updated",
-      });
-    })
-    .catch((err) => {
-      return res.json({
-        status: "error",
-        message: err.message,
+
+  try {
+    await Cart.findById(req.params.id).then(async (item) => {
+
+      let toppingsPrice = item.toppings.reduce((total, topping) => {
+        return total + topping.price;
+      }, 0);
+
+      const subTotal =
+        data.mealserving * item.price + toppingsPrice * data.mealserving;
+
+      await Cart.findByIdAndUpdate(req.params.id, {
+        mealServing: data.mealserving,
+        subTotal: subTotal,
+      }).then(() => {
+        return res.json({
+          status: "success",
+          message: "mealserving updated",
+        });
       });
     });
+  } catch (error) {
+    return res.json({
+      status: "error",
+      message: error.message,
+    });
+  }
 };
 
 exports.oneDish = async (req, res) => {
@@ -157,4 +199,5 @@ const cartSchema = joi.object().keys({
   daysInWeek: joi.array().required(),
   deliveryMode: joi.string().required(),
   price: joi.number().required(),
+  toppings: joi.array().required(),
 });

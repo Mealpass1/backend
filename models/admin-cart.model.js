@@ -32,6 +32,12 @@ const cartSchema = new Schema({
     required: true,
     default: 0,
   },
+  toppings: {
+    type: [{
+      name: String,
+      price: Number
+    }],
+  },
   subTotal: {
     type: Number,
     default: 0,

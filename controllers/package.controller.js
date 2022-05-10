@@ -70,7 +70,7 @@ exports.packages = async (req, res) => {
 };
 
 exports.package = async (req, res) => {
-  await Package.findOne({ id: req.params._id })
+  await Package.findOne({ _id: req.params.id })
     .then((response) => {
       return res.json({
         status: "success",
