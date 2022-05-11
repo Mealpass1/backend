@@ -44,3 +44,26 @@ exports.getItem = async (req, res) => {
         });
     }
 }
+
+exports.getPackageItems = async (req, res) => {
+    const data = {
+        package: req.params.package,
+    }
+
+    console.log(data);
+
+    try {
+        await Items.find({ package: data.package }).populate("dish").then(response => {
+            return res.json({
+                status: "success",
+                message: "package items",
+                data: response
+            });
+        })
+    } catch (error) {
+        return res.json({
+            status: "error",
+            message: error.message,
+        });
+    }
+}

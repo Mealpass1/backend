@@ -1,10 +1,11 @@
 const express = require("express");
 
-const { getItems, getItem } = require("../controllers/package-item.controllers")
+const { getItems, getItem, getPackageItems } = require("../controllers/package-item.controllers")
 
 const router = express.Router();
 
-router.get("/:package/:restaurant", getItems)
-router.get("/:id", getItem)
+router.get("/item/:id", getItem)
+router.get("/items/:package", getPackageItems)
+// router.get("/:package/:restaurant", getItems)
 
 module.exports = router;
