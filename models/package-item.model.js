@@ -44,6 +44,10 @@ const packageItemSchema = new Schema({
     required: true,
     default: 0,
   },
+  subTotal: {
+    type: Number,
+    default: 0,
+  },
 });
 
 module.exports = mongoose.model("Package-item", packageItemSchema);

@@ -9,15 +9,17 @@ const {
   deleteDish,
   updateDish,
   updateMealServing,
+  package
 } = require("../controllers/cart.controllers");
 
 const router = express.Router();
 
-router.post("/add", authMiddleware, addDish);
-router.get("/", authMiddleware, getAll);
-router.delete("/delete/:id", authMiddleware, deleteDish);
-router.put("/update/:id", authMiddleware, updateDish);
-router.put("/updatemealserving/:id", authMiddleware, updateMealServing);
 router.get("/:id", oneDish);
+router.get("/", authMiddleware, getAll);
+router.post("/add", authMiddleware, addDish);
+router.post("/package", authMiddleware, package)
+router.put("/update/:id", authMiddleware, updateDish);
+router.delete("/delete/:id", authMiddleware, deleteDish);
+router.put("/updatemealserving/:id", authMiddleware, updateMealServing);
 
 module.exports = router;

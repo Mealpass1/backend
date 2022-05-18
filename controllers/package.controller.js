@@ -29,7 +29,7 @@ exports.create = async (req, res) => {
     await basket
       .save()
       .then((response) => {
-        const dishes = data.dishes.map(el => ({ ...el, package: response._id }));
+        const dishes = data.dishes.map(el => ({ ...el, package: response._id, subTotal: el.subTotal }));
         PackageItems.insertMany([...dishes]).then(async (response) => {
           Cart.deleteMany({}).then((response) => {
             return res.json({

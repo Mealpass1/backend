@@ -14,7 +14,6 @@ const cartSchema = new Schema({
   },
   price: {
     type: String,
-    required: true,
   },
   quantity: {
     type: Number,
@@ -36,10 +35,7 @@ const cartSchema = new Schema({
       },
     ],
   },
-  mealServing: {
-    type: Number,
-    default: 0,
-  },
+
   //packages staffs
   package: {
     type: mongoose.Types.ObjectId,
@@ -51,6 +47,7 @@ const cartSchema = new Schema({
   dishes: {
     type: [{ type: mongoose.Types.ObjectId, ref: "Dish" }],
   },
+
   //common to both
   owner: {
     type: mongoose.Types.ObjectId,
@@ -60,6 +57,10 @@ const cartSchema = new Schema({
     type: String,
     required: true,
     enum: ["package", "dish"],
+  },
+  mealServing: {
+    type: Number,
+    default: 0,
   },
   subTotal: {
     type: Number,

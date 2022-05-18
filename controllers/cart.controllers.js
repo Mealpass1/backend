@@ -193,10 +193,10 @@ exports.package = async (req, res) => {
     package: req.body.package,
     type: "package",
     subTotal: req.body.subTotal,
+    mealServing: req.body.mealServing,
   };
 
   try {
-
     const package = new Cart({
       package: data.package,
       restaurants: data.restaurants,
@@ -204,16 +204,16 @@ exports.package = async (req, res) => {
       owner: data.owner,
       type: data.type,
       subTotal: data.subTotal,
+      mealServing: data.mealServing,
       createdAt: Date.now(),
-    })
+    });
 
     package.save().then(() => {
       return res.json({
         status: "success",
         message: "package added to cart",
-      })
-    })
-
+      });
+    });
   } catch (error) {
     return res.json({
       status: "error",
