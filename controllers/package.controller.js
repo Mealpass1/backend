@@ -16,7 +16,6 @@ exports.create = async (req, res) => {
   session.startTransaction();
 
   try {
-
     const basket = new Package({
       name: data.name,
       mealServing: data.mealServing,
@@ -26,11 +25,14 @@ exports.create = async (req, res) => {
       createdAt: Date.now(),
     });
 
-    await basket
-      .save()
-      .then((response) => {
-        const dishes = data.dishes.map(el => ({ ...el, package: response._id, subTotal: el.subTotal }));
-        PackageItems.insertMany([...dishes]).then(async (response) => {
+    await basket.save().then((response) => {
+      const dishes = data.dishes.map((el) => ({
+        ...el,
+        package: response._id,
+        subTotal: el.subTotal,
+      }));
+      PackageItems.insertMany([...dishes])
+        .then(async (response) => {
           Cart.deleteMany({}).then((response) => {
             return res.json({
               status: "success",
@@ -38,10 +40,10 @@ exports.create = async (req, res) => {
             });
           });
         })
-          .catch((err) => {
-            throw new Error(err.message);
-          });
-      });
+        .catch((err) => {
+          throw new Error(err.message);
+        });
+    });
   } catch (error) {
     await session.abortTransaction();
     await session.endSession();

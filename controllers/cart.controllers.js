@@ -222,6 +222,26 @@ exports.package = async (req, res) => {
   }
 };
 
+exports.deletePackage = async (req, res) => {
+  const data = {
+    package: req.params.package,
+  };
+
+  await Cart.findByIdAndRemove(data.package, async (err, item) => {
+    if (err) {
+      return res.json({
+        status: "error",
+        message: err.message,
+      });
+    } else {
+      return res.json({
+        status: "success",
+        message: "Cart package deleted",
+      });
+    }
+  }).clone();
+};
+
 const cartSchema = joi.object().keys({
   quantity: joi.number().required(),
   timeOfMeal: joi.string().required(),
