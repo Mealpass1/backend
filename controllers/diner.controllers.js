@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv").config();
 
 const Diner = require("../models/diner.model");
-const sendMail = require("../services/diner-email.service");
+// const sendMail = require("../services/diner-email.service");
 
 exports.signup = async (req, res) => {
   const data = {
@@ -51,7 +51,7 @@ exports.signup = async (req, res) => {
                   await diner
                     .save()
                     .then((response) => {
-                      sendMail(response.email, response.fullname);
+                      // sendMail(response.email, response.fullname);
                       return res.json({
                         status: "success",
                         message: "diner created",
